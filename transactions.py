@@ -1,4 +1,4 @@
-class Items:
+class Item:
     def __init__(self, name: str, type: str, weight: float, price: float):
         self._name = name
         self._type = type
@@ -9,20 +9,20 @@ class Items:
         return f'{self._name} ({self._type}) - Weight: {self._weight} kg / Price: {self._price:.2f} KM'
     
 if __name__ == '__main__':
-    milk = Items('Milk', 'Dairy', 1, 2.50)
+    milk = Item('Milk', 'Dairy', 1, 2.50)
     print (milk)
-    eggs = Items('Eggs', 'Dairy' , 0.5, 3.00)
+    eggs = Item('Eggs', 'Dairy' , 0.5, 3.00)
     print (eggs)
-    cheese = Items('Cheese', 'Dairy', 1, 10.00)
+    cheese = Item('Cheese', 'Dairy', 1, 10.00)
     print (cheese)
-    bread = Items('Bread', 'Baked Goods', 0.5, 1.60)
+    bread = Item('Bread', 'Baked Goods', 0.5, 1.60)
     print (bread)
-    coffee = Items('Coffee', 'Beverages', 0.5, 5.00)
+    coffee = Item('Coffee', 'Beverages', 0.5, 5.00)
     print (coffee)
-    juice = Items('Juice', 'Beverages', 1, 3.50)
+    juice = Item('Juice', 'Beverages', 1, 3.50)
     print (juice)
-    pork = Items('Pork', 'Meat', 1, 13)
+    pork = Item('Pork', 'Meat', 1, 13)
     print (pork)
-    chicken_breast = ('Chicken Breast', 'Meat', 1, 10)
+    chicken_breast = Item('Chicken Breast', 'Meat', 1, 10)
     print (chicken_breast)
-    
+    pass
