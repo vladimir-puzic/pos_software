@@ -1,0 +1,7 @@
+1. error when creating employee using Employee(create_employee()). the class receives only the first variable from the create_employee() return tuple
+
+Traceback (most recent call last):
+  File "/home/puza/python/pos_software/people.py", line 61, in <module>
+    emp2 = Employee(create_employee())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Employee.__init__() missing 4 required positional arguments: 'l_name', 'gender', 'phone_no', and 'employee_id'
