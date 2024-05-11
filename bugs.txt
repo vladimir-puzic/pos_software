@@ -1,4 +1,5 @@
-1. error when creating employee using Employee(create_employee()). the class receives only the first variable from the create_employee() return tuple
+
+1. [FIXED] error when creating employee using Employee(create_employee()). the class receives only the first variable from the create_employee() return tuple
 
 Traceback (most recent call last):
   File "/home/puza/python/pos_software/people.py", line 61, in <module>
