@@ -51,11 +51,13 @@ def create_employee():
     phone_no = int(f'6{randint(1,6)}{randint(000000,999999):06d}')
 
     employee_id = (f'{f_name[0].lower()}{l_name[0].lower()}{randint(000000,999999)}')
-    return (f_name, l_name, gender, phone_no, employee_id)
+    return [f_name, l_name, gender, phone_no, employee_id]
 
 if __name__ == '__main__':
     cust1 = Customer('Nikolina', 'Zubac', 'Female', datetime(1996, 4, 1), 558)
     print (cust1)
     emp1 = Employee('Vladimir', 'Puzic', 'Male', 65953513, 'vp553')
     print (emp1)
-    emp2 = Employee(create_employee())
+    f_name, l_name, gender, phone_no, employee_id = create_employee()
+    emp2 = Employee(f_name, l_name, gender, phone_no, employee_id)
+    print (emp2)
