@@ -7,6 +7,8 @@ class DatabaseSession:
         self._db_name = db_name
         self.connection = None
 
+#DATABASE MANAGEMENT
+
     def connect_to_database(self):
         self.connection = sqlite3.connect(f'{self._db_name}.db')
 
@@ -16,7 +18,7 @@ class DatabaseSession:
         for table in table_list:
             print(table)
             print()
-        
+
     def db_create_employees_table(self):
         cursor = self.connection.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Employees ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'phone_number' INTEGER, 'employee_id' TEXT)")
@@ -25,9 +27,15 @@ class DatabaseSession:
         cursor = self.connection.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Customers ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'date_of_birth' DATE, 'customer_id' INTEGER)")
    
+    def db_create_items_table(self):
+        cursor = self.connection.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS Items ('name' TEXT, 'type' TEXT, 'weight' FLOAT, 'price' FLOAT)")
+
     def db_drop_table(self, table_name: str):
         cursor = self.connection.cursor()
         cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+
+#EMPLOYEE MANAGEMENT
 
     def db_create_employee(self, f_name: str, l_name: str, gender: str, phone_no: int, employee_id: str):
         cursor = self.connection.cursor()
@@ -51,6 +59,8 @@ class DatabaseSession:
         cursor.execute(f"DELETE FROM Employees")
         self.connection.commit()       
 
+#CUSTOMER MANAGEMENT
+
     def db_create_customer(self, f_name: str, l_name: str, gender: str, dob: date, customer_id: int):
         cursor = self.connection.cursor()
         cursor.execute(f"INSERT INTO Customers VALUES ('{f_name}', '{l_name}', '{gender}', '{dob}', '{customer_id}')")
@@ -66,11 +76,33 @@ class DatabaseSession:
         cursor = self.connection.cursor()
         cursor.execute(f"DELETE FROM Customers WHERE customer_id = '{customer_id}'")
         self.connection.commit()    
-        pass
 
     def db_delete_customer_all(self):
         cursor = self.connection.cursor()
         cursor.execute(f"DELETE FROM Customers")
+        self.connection.commit()
+
+#ITEM MANAGEMENT
+
+    def db_create_item(self, name: str, type: str, weight: float, price: float):
+        cursor = self.connection.cursor()
+        cursor.execute(f"INSERT INTO Items VALUES ('{name}', '{type}', '{weight}', '{price}')")
+        self.connection.commit()
+    
+    def db_list_items(self):
+        cursor = self.connection.cursor()
+        items_list = cursor.execute(f"SELECT * FROM Items").fetchall()
+        for item in items_list:
+            print(item)
+    
+    def db_delete_item_name(self, name: str):
+        cursor = self.connection.cursor()
+        cursor.execute(f"DELETE FROM Items WHERE name = '{name}'")
+        self.connection.commit() 
+
+    def db_delete_item_all(self):
+        cursor = self.connection.cursor()
+        cursor.execute(f"DELETE FROM Items")
         self.connection.commit()
 
 if __name__ == '__main__':
@@ -89,6 +121,7 @@ if __name__ == '__main__':
         print('1 - transactions')
         print('2 - customers')
         print('3 - employees')
+        print('4 - items')
         print('9 - manage database')
         action_prompt = int(input('Select action: '))
         if action_prompt == 9:
@@ -114,12 +147,15 @@ if __name__ == '__main__':
                             while True:
                                 print('1 - employees')
                                 print('2 - customers')
+                                print('3 - items')
                                 print('0 - return')
                                 table_prompt = int(input(''))
                                 if table_prompt == 1:
                                     session.db_create_employees_table()
                                 elif table_prompt == 2:
                                     session.db_create_customers_table()
+                                elif table_prompt == 3:
+                                    session.db_create_items_table()
                                 elif table_prompt == 0:
                                     break
                         elif table_management_prompt == 3:
@@ -141,7 +177,7 @@ if __name__ == '__main__':
                 print()
                 print('1 - list customers')
                 print('2 - create customers')
-                print('3 - drop customers')
+                print('3 - delete customers')
                 print('0 - return')
                 customer_management_prompt = int(input(''))
                 if customer_management_prompt == 1:
@@ -201,7 +237,7 @@ if __name__ == '__main__':
                 print()
                 print('1 - list employees')
                 print('2 - create employees')
-                print('3 - drop employees')
+                print('3 - delete employees')
                 print('0 - return')
                 employee_management_prompt = int(input(''))
                 if employee_management_prompt == 1:
@@ -237,20 +273,74 @@ if __name__ == '__main__':
                         elif employe_creation_prompt == 0:
                             break      
                 elif employee_management_prompt == 3:
-                    print('Employee deletion')
-                    print()
-                    print('1 - delete via ID')
-                    print('2 - delete all')
-                    print('0 - return')
-                    employee_deletion_prompt = int(input(''))
-                    if employee_deletion_prompt == 1:
-                        employee_id_prompt = input('Enter Employee ID: ')
-                        session.db_delete_employee_id(employee_id_prompt)
-                    elif employee_deletion_prompt == 2:
-                        session.db_delete_employee_all()
-                    elif employee_deletion_prompt == 0:
-                        break
+                    while True:
+                        print('Employee deletion')
+                        print()
+                        print('1 - delete via ID')
+                        print('2 - delete all')
+                        print('0 - return')
+                        employee_deletion_prompt = int(input(''))
+                        if employee_deletion_prompt == 1:
+                            employee_id_prompt = input('Enter Employee ID: ')
+                            session.db_delete_employee_id(employee_id_prompt)
+                        elif employee_deletion_prompt == 2:
+                            session.db_delete_employee_all()
+                        elif employee_deletion_prompt == 0:
+                            break
                 elif employee_management_prompt == 0:
                     break
+        elif action_prompt == 4:
+            while True:
+                print('Item management')
+                print()
+                print('1 - list items')
+                print('2 - create item')
+                print('3 - delete item')
+                print('0 - return')
+                item_management_prompt = int(input(''))
+                if item_management_prompt == 1:
+                    session.db_list_items()
+                elif item_management_prompt == 2:
+                    print('Item creation')
+                    print()
+                    print('1 - create custom')
+                    print('2 - create standard list')
+                    print('0 - return')
+                    item_creation_prompt = int(input(''))
+                    if item_creation_prompt == 1:
+                        name = input('Item name:')
+                        type = input('Type: ')
+                        weight = float(input('Weight: '))
+                        price = float(input('Price: '))
+                        session.db_create_item(name, type, weight, price)
+                    elif item_creation_prompt == 2:
+                            milk = ('Milk', 'Dairy', 1, 2.50)
+                            eggs = ('Eggs', 'Dairy' , 0.5, 3.00)                           
+                            cheese = ('Cheese', 'Dairy', 1, 10.00)
+                            bread = ('Bread', 'Baked Goods', 0.5, 1.60)
+                            coffee = ('Coffee', 'Beverages', 0.5, 5.00)
+                            juice = ('Juice', 'Beverages', 1, 3.50)
+                            pork = ('Pork', 'Meat', 1, 13)
+                            chicken_breast = ('Chicken Breast', 'Meat', 1, 10)
+                            item_standard_list = [milk, eggs, cheese, bread, coffee, juice, pork, chicken_breast]
+                            for item in item_standard_list:
+                                name, type, weight, price = item
+                                session.db_create_item(name, type, weight, price)
+                    elif item_creation_prompt == 0:
+                        break
+                elif item_management_prompt == 3:
+                    while True:
+                        print('Item deletion')
+                        print()
+                        print('1 - delete via name')
+                        print('2 - delete all')
+                        print('0 - return')
+                        item_deletion_prompt = int(input(''))
+                        if item_deletion_prompt == 1:
+                            item_name_prompt = input('Enter Item Name:')
+                            session.db_delete_item_name(item_name_prompt)
+                        elif item_deletion_prompt == 2:
+                            session.db_delete_item_all()
+                        elif item_deletion_prompt == 0:
+                            break
 
-    
