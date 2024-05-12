@@ -1,5 +1,6 @@
 import sqlite3
-from people import create_employee
+from people import create_employee, create_customer
+from datetime import date
 
 class DatabaseSession:
     def __init__(self, db_name: str):
@@ -22,7 +23,7 @@ class DatabaseSession:
     
     def db_create_customers_table(self):
         cursor = self.connection.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS Customers ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'date_of_birth' DATE, 'customer_id' TEXT)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS Customers ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'date_of_birth' DATE, 'customer_id' INTEGER)")
    
     def db_drop_table(self, table_name: str):
         cursor = self.connection.cursor()
@@ -49,6 +50,28 @@ class DatabaseSession:
         cursor = self.connection.cursor()
         cursor.execute(f"DELETE FROM Employees")
         self.connection.commit()       
+
+    def db_create_customer(self, f_name: str, l_name: str, gender: str, dob: date, customer_id: int):
+        cursor = self.connection.cursor()
+        cursor.execute(f"INSERT INTO Customers VALUES ('{f_name}', '{l_name}', '{gender}', '{dob}', '{customer_id}')")
+        self.connection.commit()
+
+    def db_list_customers(self):
+        cursor = self.connection.cursor()
+        customers_list = cursor.execute(f"SELECT * FROM Customers").fetchall()
+        for customer in customers_list:
+            print(customer)
+    
+    def db_delete_customer_id(self, customer_id: str):
+        cursor = self.connection.cursor()
+        cursor.execute(f"DELETE FROM Customers WHERE customer_id = '{customer_id}'")
+        self.connection.commit()    
+        pass
+
+    def db_delete_customer_all(self):
+        cursor = self.connection.cursor()
+        cursor.execute(f"DELETE FROM Customers")
+        self.connection.commit()
 
 if __name__ == '__main__':
     db_name = input('Enter DB name: ')
@@ -113,7 +136,65 @@ if __name__ == '__main__':
         elif action_prompt == 1:
             pass
         elif action_prompt == 2:
-            pass
+            while True: 
+                print('Customer management')
+                print()
+                print('1 - list customers')
+                print('2 - create customers')
+                print('3 - drop customers')
+                print('0 - return')
+                customer_management_prompt = int(input(''))
+                if customer_management_prompt == 1:
+                    session.db_list_customers()
+                elif customer_management_prompt == 2:
+                    while True:
+                        print('Customer creation')
+                        print()
+                        print('1 - create custom')
+                        print('2 - create random')
+                        print('3 - create multiple')
+                        print('0 - return')
+                        customer_creation_prompt = int(input(''))
+                        if customer_creation_prompt == 1:
+                            f_name = input('First name: ')
+                            l_name = input('Last name: ')
+                            gender = input('Gender: ')
+                            year = int(input('Year of birth: '))
+                            month = int(input('Month: '))
+                            day = int(input('Day: '))
+                            dob = date(year, month, day)
+                            customer_id = input('Customer ID:')
+                            session.db_create_customer(f_name, l_name, gender, dob, customer_id)
+                        elif customer_creation_prompt == 2:
+                            f_name, l_name, gender, dob, customer_id = create_customer()
+                            print (f_name, l_name, gender, dob, customer_id)
+                            session.db_create_customer(f_name, l_name, gender, dob, customer_id)
+                        elif customer_creation_prompt == 3:
+                            customer_number = int(input('Number of customers: '))
+                            if customer_number == 0:
+                                break
+                            for number in range(customer_number):
+                                f_name, l_name, gender, dob, customer_id = create_customer()
+                                print (f_name, l_name, gender, dob, customer_id)
+                                session.db_create_customer(f_name, l_name, gender, dob, customer_id)
+                        elif customer_creation_prompt == 0:
+                            break      
+                elif customer_management_prompt == 3:
+                    print('Customer deletion')
+                    print()
+                    print('1 - delete via ID')
+                    print('2 - delete all')
+                    print('0 - return')
+                    customer_deletion_prompt = int(input(''))
+                    if customer_deletion_prompt == 1:
+                        customer_id_prompt = int(input('Enter Customer ID: '))
+                        session.db_delete_customer_id(customer_id_prompt)
+                    elif customer_deletion_prompt == 2:
+                        session.db_delete_customer_all()
+                    elif customer_deletion_prompt == 0:
+                        break
+                elif customer_management_prompt == 0:
+                    break
         elif action_prompt == 3:
             while True: 
                 print('Employee management')
@@ -169,7 +250,7 @@ if __name__ == '__main__':
                         session.db_delete_employee_all()
                     elif employee_deletion_prompt == 0:
                         break
-                elif employe_creation_prompt == 0:
+                elif employee_management_prompt == 0:
                     break
 
     
