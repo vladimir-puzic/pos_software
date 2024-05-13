@@ -55,6 +55,7 @@ def create_employee():
     phone_no = int(f'6{randint(1,6)}{randint(000000,999999):06d}')
 
     employee_id = (f'{f_name[0].lower()}{l_name[0].lower()}{randint(000000,999999)}')
+    
     return [f_name, l_name, gender, phone_no, employee_id]
 
 def create_customer():

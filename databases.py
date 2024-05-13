@@ -1,6 +1,7 @@
 import sqlite3
 from people import create_employee, create_customer
-from datetime import date
+from transactions import create_transaction
+from datetime import date, datetime
 
 class DatabaseSession:
     def __init__(self, db_name: str):
@@ -31,6 +32,10 @@ class DatabaseSession:
         cursor = self.connection.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Items ('name' TEXT, 'type' TEXT, 'weight' FLOAT, 'price' FLOAT)")
 
+    def db_create_transactions_table(self):
+        cursor = self.connection.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS Transactions ('transaction_id' TEXT, 'customer_id' INTAGER, 'employee_id' TEXT, 'total' FLOAT, 'timestamp' DATETIME)")
+
     def db_drop_table(self, table_name: str):
         cursor = self.connection.cursor()
         cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
@@ -47,6 +52,11 @@ class DatabaseSession:
         employees_list = cursor.execute(f"SELECT * FROM Employees").fetchall()
         for employee in employees_list:
             print(employee)
+    
+    def db_list_employee_id(self):
+        cursor = self.connection.cursor()
+        employee_id_list = cursor.execute(f"SELECT employee_id FROM Employees").fetchall()
+        return employee_id_list
     
     def db_delete_employee_id(self, employee_id: str):
         cursor = self.connection.cursor()
@@ -71,6 +81,11 @@ class DatabaseSession:
         customers_list = cursor.execute(f"SELECT * FROM Customers").fetchall()
         for customer in customers_list:
             print(customer)
+
+    def db_list_customer_id(self):
+        cursor = self.connection.cursor()
+        customer_id_list = cursor.execute(f"SELECT customer_id FROM Customers").fetchall()
+        return customer_id_list
     
     def db_delete_customer_id(self, customer_id: str):
         cursor = self.connection.cursor()
@@ -105,6 +120,29 @@ class DatabaseSession:
         cursor.execute(f"DELETE FROM Items")
         self.connection.commit()
 
+#TRANSACTION MANAGEMENT
+
+    def db_create_transaction(self, transaction_id: str, customer_id: str, employee_id: str, total: float, timestamp: datetime):
+        cursor = self.connection.cursor()
+        cursor.execute(f"INSERT INTO Transactions VALUES ('{transaction_id}', '{customer_id}', '{employee_id}', '{total}', '{timestamp}')")
+        self.connection.commit()
+
+    def db_list_transactions(self):
+        cursor = self.connection.cursor()
+        transactions_list = cursor.execute(f"SELECT * FROM Transactions").fetchall()
+        for transaction in transactions_list:
+            print(transaction)
+    
+    def db_delete_transaction_id(self, transaction_id: str):
+        cursor = self.connection.cursor()
+        cursor.execute(f"DELETE FROM Transactions WHERE transaction_id = '{transaction_id}'")
+        self.connection.commit() 
+
+    def db_delete_transactions_all(self):
+        cursor = self.connection.cursor()
+        cursor.execute(f"DELETE FROM Transactions")
+        self.connection.commit()
+
 if __name__ == '__main__':
     db_name = input('Enter DB name: ')
     session = DatabaseSession(db_name)
@@ -124,53 +162,63 @@ if __name__ == '__main__':
         print('4 - items')
         print('9 - manage database')
         action_prompt = int(input('Select action: '))
-        if action_prompt == 9:
+        if action_prompt == 1:
             while True:
-                print('DB management')
+                print('Transaction management')
                 print()
-                print('1 - manage tables')
-                print('2 - manage database')
+                print('1 - list transactions')
+                print('2 - create transactions')
+                print('3 - delete transactions')
                 print('0 - return')
-                manage_prompt = int(input(''))
-                if manage_prompt == 1:
+                transaction_management_prompt = int(input(''))
+                if transaction_management_prompt == 1:
+                    session.db_list_transactions()
+                elif transaction_management_prompt == 2:
                     while True:
-                        print('Table management')
+                        print('Transaction creation')
                         print()
-                        print('1 - list tables')
-                        print('2 - create tables')
-                        print('3 - drop table')
+                        print('1 - create custom')
+                        print('2 - create random')
+                        print('3 - create multiple')
                         print('0 - return')
-                        table_management_prompt = int(input(''))
-                        if table_management_prompt == 1:
-                            print(session.list_tables())
-                        elif table_management_prompt == 2:
-                            while True:
-                                print('1 - employees')
-                                print('2 - customers')
-                                print('3 - items')
-                                print('0 - return')
-                                table_prompt = int(input(''))
-                                if table_prompt == 1:
-                                    session.db_create_employees_table()
-                                elif table_prompt == 2:
-                                    session.db_create_customers_table()
-                                elif table_prompt == 3:
-                                    session.db_create_items_table()
-                                elif table_prompt == 0:
-                                    break
-                        elif table_management_prompt == 3:
-                            table_name = input('Table name: ')
-                            if table_name == '':
+                        transaction_creation_prompt = int(input(''))
+                        if transaction_creation_prompt == 1:
+                            transaction_id = input('Transaction ID: ')
+                            customer_id = int(input('Customer ID: '))
+                            employee_id = input('Employee ID: ')
+                            total = input('Total: ')
+                            timestamp = datetime(input('Timestamp: '))
+                            session.db_create_transaction(transaction_id, customer_id, employee_id, total, timestamp)
+                        elif transaction_creation_prompt == 2:
+                            transaction_id, customer_id, employee_id, total, timestamp = create_transaction(session.db_list_customer_id(), session.db_list_employee_id(), 5.00)
+                            print(transaction_id, customer_id, employee_id, total, timestamp)
+                            session.db_create_transaction(transaction_id, customer_id, employee_id, total, timestamp)
+                        elif transaction_creation_prompt == 3:
+                            transaction_number = int(input('Number of transactions: '))
+                            if transaction_number == 0:
                                 break
-                            session.db_drop_table(table_name)
-                        elif table_management_prompt == 0:
+                            for number in range(transaction_number):
+                                transaction_id, customer_id, employee_id, total, timestamp = create_transaction(session.db_list_customer_id(), session.db_list_employee_id(), 5.00)
+                                print(transaction_id, customer_id, employee_id, total, timestamp)
+                                session.db_create_transaction(transaction_id, customer_id, employee_id, total, timestamp)
+                        elif transaction_creation_prompt == 0:
                             break
-                elif manage_prompt == 2:
-                    pass
-                elif manage_prompt == 0:
-                    break
-        elif action_prompt == 1:
-            pass
+                elif transaction_management_prompt == 3:
+                    print('Transaction deletion')
+                    print()
+                    print('1 - delete via ID')
+                    print('2 - delete all')
+                    print('0 - return')
+                    transaction_deletion_prompt = int(input(''))
+                    if transaction_deletion_prompt == 1:
+                        transaction_id_prompt = input('Enter Transaction ID: ')
+                        session.db_delete_transaction_id(transaction_id_prompt)
+                    elif transaction_deletion_prompt == 2:
+                        session.db_delete_transactions_all()
+                    elif transaction_deletion_prompt == 0:
+                        break  
+                elif transaction_management_prompt == 0:
+                    break                  
         elif action_prompt == 2:
             while True: 
                 print('Customer management')
@@ -343,4 +391,51 @@ if __name__ == '__main__':
                             session.db_delete_item_all()
                         elif item_deletion_prompt == 0:
                             break
-
+        elif action_prompt == 9:
+            while True:
+                print('DB management')
+                print()
+                print('1 - manage tables')
+                print('2 - manage database')
+                print('0 - return')
+                manage_prompt = int(input(''))
+                if manage_prompt == 1:
+                    while True:
+                        print('Table management')
+                        print()
+                        print('1 - list tables')
+                        print('2 - create tables')
+                        print('3 - drop table')
+                        print('0 - return')
+                        table_management_prompt = int(input(''))
+                        if table_management_prompt == 1:
+                            print(session.list_tables())
+                        elif table_management_prompt == 2:
+                            while True:
+                                print('1 - transactions')
+                                print('2 - customers')
+                                print('3 - employees')
+                                print('4 - items')
+                                print('0 - return')
+                                table_prompt = int(input(''))
+                                if table_prompt == 1:
+                                    session.db_create_transactions_table()
+                                elif table_prompt == 2:
+                                    session.db_create_customers_table()
+                                elif table_prompt == 3:
+                                    session.db_create_employees_table()
+                                elif table_prompt == 4:
+                                    session.db_create_items_table()
+                                elif table_prompt == 0:
+                                    break
+                        elif table_management_prompt == 3:
+                            table_name = input('Table name: ')
+                            if table_name == '':
+                                break
+                            session.db_drop_table(table_name)
+                        elif table_management_prompt == 0:
+                            break
+                elif manage_prompt == 2:
+                    pass
+                elif manage_prompt == 0:
+                    break
