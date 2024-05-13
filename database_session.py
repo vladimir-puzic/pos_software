@@ -158,11 +158,15 @@ class DatabaseSession:
     def db_delete_transaction_id(self, transaction_id: str):
         cursor = self.connection.cursor()
         cursor.execute(f"DELETE FROM Transactions WHERE transaction_id = '{transaction_id}'")
+        cursor = self.connection.cursor()
+        cursor.execute(f"DELETE FROM Itemizer WHERE transaction_id = '{transaction_id}'")
         self.connection.commit() 
 
     def db_delete_transactions_all(self):
         cursor = self.connection.cursor()
         cursor.execute(f"DELETE FROM Transactions")
+        cursor = self.connection.cursor()
+        cursor.execute(f"DELETE FROM Itemizer")
         self.connection.commit()
 
 if __name__ == '__main__':
