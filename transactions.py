@@ -3,7 +3,8 @@ from datetime import datetime
 from random import randint, choice
 
 class Item:
-    def __init__(self, name: str, type: str, weight: float, price: float):
+    def __init__(self, plu: int, name: str, type: str, weight: float, price: float):
+        self._plu = plu
         self._name = name
         self._type = type
         self._price = price
@@ -14,7 +15,7 @@ class Item:
 
 class Transaction:
     def __init__(self, transaction_id: str, customer_id: int, employee_id: str, timestamp: datetime):
-        self._transactions_id = transaction_id
+        self._transaction_id = transaction_id
         self._customer_id = customer_id
         self._employee_id = employee_id
         self._total = None
@@ -33,21 +34,24 @@ def create_transaction(customer_id_list: list, employee_id_list: list, sum_total
 
     return [transaction_id, customer_id, employee_id, total, timestamp]
 
+def itemize(transaction_id: str):
+    pass
+
 if __name__ == '__main__':
-    milk = Item('Milk', 'Dairy', 1, 2.50)
+    milk = Item(644455, 'Milk', 'Dairy', 1, 2.50)
     print (milk)
-    eggs = Item('Eggs', 'Dairy' , 0.5, 3.00)
+    eggs = Item(994111, 'Eggs', 'Dairy' , 0.5, 3.00)
     print (eggs)
-    cheese = Item('Cheese', 'Dairy', 1, 10.00)
+    cheese = Item(222449, 'Cheese', 'Dairy', 1, 10.00)
     print (cheese)
-    bread = Item('Bread', 'Baked Goods', 0.5, 1.60)
+    bread = Item(227779, 'Bread', 'Baked Goods', 0.5, 1.60)
     print (bread)
-    coffee = Item('Coffee', 'Beverages', 0.5, 5.00)
+    coffee = Item(222666, 'Coffee', 'Beverages', 0.5, 5.00)
     print (coffee)
-    juice = Item('Juice', 'Beverages', 1, 3.50)
+    juice = Item(588444, 'Juice', 'Beverages', 1, 3.50)
     print (juice)
-    pork = Item('Pork', 'Meat', 1, 13)
+    pork = Item(766611, 'Pork', 'Meat', 1, 13)
     print (pork)
-    chicken_breast = Item('Chicken Breast', 'Meat', 1, 10)
+    chicken_breast = Item(222444, 'Chicken Breast', 'Meat', 1, 10)
     print (chicken_breast)
     pass
