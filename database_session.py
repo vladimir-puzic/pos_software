@@ -443,6 +443,8 @@ if __name__ == '__main__':
                             session.db_delete_item_all()
                         elif item_deletion_prompt == 0:
                             break
+                elif item_management_prompt == 0:
+                    break
         elif action_prompt == 9:
             while True:
                 print('DB management')
