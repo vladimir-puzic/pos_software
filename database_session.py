@@ -8,40 +8,35 @@ class DatabaseSession:
     def __init__(self, db_name: str):
         self._db_name = db_name
         self.connection = None
+        self.cursor = None
 
 #DATABASE MANAGEMENT
 
     def connect_to_database(self):
         self.connection = sqlite3.connect(f'{self._db_name}.db')
+        self.cursor = self.connection.cursor()
 
     def list_tables(self):
-        cursor = self.connection.cursor()
-        table_list = cursor.execute(f"SELECT * FROM sqlite_master WHERE type='table';").fetchall()
+        table_list = self.cursor.execute(f"SELECT * FROM sqlite_master WHERE type='table';").fetchall()
         for table in table_list:
             print(table)
             print()
 
     def db_create_employees_table(self):
-        cursor = self.connection.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS Employees ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'phone_number' INTEGER, 'employee_id' TEXT)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS Employees ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'phone_number' INTEGER, 'employee_id' TEXT)")
     
     def db_create_customers_table(self):
-        cursor = self.connection.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS Customers ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'date_of_birth' DATE, 'customer_id' INTEGER)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS Customers ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'date_of_birth' DATE, 'customer_id' INTEGER)")
    
     def db_create_items_table(self):
-        cursor = self.connection.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS Items ('plu' INTAGER, 'name' TEXT, 'type' TEXT, 'weight' FLOAT, 'price' FLOAT)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS Items ('plu' INTAGER, 'name' TEXT, 'type' TEXT, 'weight' FLOAT, 'price' FLOAT)")
 
     def db_create_transactions_table(self):
-        cursor = self.connection.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS Transactions ('transaction_id' TEXT, 'customer_id' INTAGER, 'employee_id' TEXT, 'total' FLOAT, 'timestamp' DATETIME)")
-        cursor = self.connection.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS Itemizer ('transaction_id' TEXT, 'plu' INTAGER, 'item_name' TEXT, 'amount' INTAGER)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS Transactions ('transaction_id' TEXT, 'customer_id' INTAGER, 'employee_id' TEXT, 'total' FLOAT, 'timestamp' DATETIME)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS Itemizer ('transaction_id' TEXT, 'plu' INTAGER, 'item_name' TEXT, 'amount' INTAGER)")
 
     def db_drop_table(self, table_name: str):
-        cursor = self.connection.cursor()
-        cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+        self.cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
 
 #EMPLOYEE MANAGEMENT
 
