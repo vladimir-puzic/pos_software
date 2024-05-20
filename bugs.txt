@@ -6,3 +6,6 @@ Traceback (most recent call last):
     emp2 = Employee(create_employee())
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: Employee.__init__() missing 4 required positional arguments: 'l_name', 'gender', 'phone_no', and 'employee_id'
+
+
+2. [FIXED] 0 return input does not work when in 'Item management' menu
