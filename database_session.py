@@ -9,12 +9,19 @@ class DatabaseSession:
         self._db_name = db_name
         self.connection = None
         self.cursor = None
+        self._user = None
 
-#DATABASE MANAGEMENT
+#SESSION MANAGEMENT
 
     def connect_to_database(self):
         self.connection = sqlite3.connect(f'{self._db_name}.db')
         self.cursor = self.connection.cursor()
+        print(f"Connected to DB '{db_name}'")
+
+    def return_db_name(self):
+        return self._db_name
+
+#DATABASE MANAGEMENT
 
     def list_tables(self):
         table_list = self.cursor.execute(f"SELECT * FROM sqlite_master WHERE type='table';").fetchall()
@@ -41,139 +48,120 @@ class DatabaseSession:
 #EMPLOYEE MANAGEMENT
 
     def db_create_employee(self, f_name: str, l_name: str, gender: str, phone_no: int, employee_id: str):
-        cursor = self.connection.cursor()
-        cursor.execute(f"INSERT INTO Employees VALUES ('{f_name}', '{l_name}', '{gender}', '{phone_no}', '{employee_id}')")
+        self.cursor.execute(f"INSERT INTO Employees VALUES ('{f_name}', '{l_name}', '{gender}', '{phone_no}', '{employee_id}')")
         self.connection.commit()
 
     def db_list_employees(self):
-        cursor = self.connection.cursor()
-        employees_list = cursor.execute(f"SELECT * FROM Employees").fetchall()
+        employees_list = self.cursor.execute(f"SELECT * FROM Employees").fetchall()
         for employee in employees_list:
             print(employee)
     
     def db_list_employee_id(self):
-        cursor = self.connection.cursor()
-        employee_id_list = cursor.execute(f"SELECT employee_id FROM Employees").fetchall()
+        employee_id_list = self.cursor.execute(f"SELECT employee_id FROM Employees").fetchall()
         return employee_id_list
     
     def db_delete_employee_id(self, employee_id: str):
-        cursor = self.connection.cursor()
-        cursor.execute(f"DELETE FROM Employees WHERE employee_id = '{employee_id}'")
+        self.cursor.execute(f"DELETE FROM Employees WHERE employee_id = '{employee_id}'")
         self.connection.commit()    
 
     def db_delete_employee_all(self):
-        cursor = self.connection.cursor()
-        cursor.execute(f"DELETE FROM Employees")
+        self.cursor.execute(f"DELETE FROM Employees")
         self.connection.commit()       
 
 #CUSTOMER MANAGEMENT
 
     def db_create_customer(self, f_name: str, l_name: str, gender: str, dob: date, customer_id: int):
-        cursor = self.connection.cursor()
-        cursor.execute(f"INSERT INTO Customers VALUES ('{f_name}', '{l_name}', '{gender}', '{dob}', '{customer_id}')")
+        self.cursor.execute(f"INSERT INTO Customers VALUES ('{f_name}', '{l_name}', '{gender}', '{dob}', '{customer_id}')")
         self.connection.commit()
 
     def db_list_customers(self):
-        cursor = self.connection.cursor()
-        customers_list = cursor.execute(f"SELECT * FROM Customers").fetchall()
+        customers_list = self.cursor.execute(f"SELECT * FROM Customers").fetchall()
         for customer in customers_list:
             print(customer)
 
     def db_list_customer_id(self):
-        cursor = self.connection.cursor()
-        customer_id_list = cursor.execute(f"SELECT customer_id FROM Customers").fetchall()
+        customer_id_list = self.cursor.execute(f"SELECT customer_id FROM Customers").fetchall()
         return customer_id_list
     
     def db_delete_customer_id(self, customer_id: str):
-        cursor = self.connection.cursor()
-        cursor.execute(f"DELETE FROM Customers WHERE customer_id = '{customer_id}'")
+        self.cursor.execute(f"DELETE FROM Customers WHERE customer_id = '{customer_id}'")
         self.connection.commit()    
 
     def db_delete_customer_all(self):
-        cursor = self.connection.cursor()
-        cursor.execute(f"DELETE FROM Customers")
+        self.cursor.execute(f"DELETE FROM Customers")
         self.connection.commit()
 
 #ITEM MANAGEMENT
 
     def db_create_item(self, plu: int, name: str, type: str, weight: float, price: float):
-        cursor = self.connection.cursor()
-        cursor.execute(f"INSERT INTO Items VALUES ('{plu}', '{name}', '{type}', '{weight}', '{price}')")
+        self.cursor.execute(f"INSERT INTO Items VALUES ('{plu}', '{name}', '{type}', '{weight}', '{price}')")
         self.connection.commit()
     
     def db_list_items(self):
-        cursor = self.connection.cursor()
-        items_list = cursor.execute(f"SELECT * FROM Items").fetchall()
+        items_list = self.cursor.execute(f"SELECT * FROM Items").fetchall()
         for item in items_list:
             print(item)
     
     def db_return_items(self):
-        cursor = self.connection.cursor()
-        items_list = cursor.execute(f"SELECT * FROM Items").fetchall()
+        items_list = self.cursor.execute(f"SELECT * FROM Items").fetchall()
         return items_list
     
     def db_list_item_plu(self):
-        cursor = self.connection.cursor()
-        item_plu_list = cursor.execute(f"SELECT plu FROM Items").fetchall()
+        item_plu_list = self.cursor.execute(f"SELECT plu FROM Items").fetchall()
         return item_plu_list
     
     def db_fetch_item_data(self, item_name):
-        cursor = self.connection.cursor()
-        item_data = cursor.execute(f"SELECT * FROM Items WHERE name='{item_name}'").fetchall()
+        item_data = self.cursor.execute(f"SELECT * FROM Items WHERE name='{item_name}'").fetchall()
         return item_data
     
     def db_delete_item_name(self, name: str):
-        cursor = self.connection.cursor()
-        cursor.execute(f"DELETE FROM Items WHERE name = '{name}'")
+        self.cursor.execute(f"DELETE FROM Items WHERE name = '{name}'")
         self.connection.commit() 
 
     def db_delete_item_all(self):
-        cursor = self.connection.cursor()
-        cursor.execute(f"DELETE FROM Items")
+        self.cursor.execute(f"DELETE FROM Items")
         self.connection.commit()
 
 #TRANSACTION MANAGEMENT
 
     def db_create_transaction(self, transaction_id: str, customer_id: str, employee_id: str, total: float, timestamp: datetime):
-        cursor = self.connection.cursor()
-        cursor.execute(f"INSERT INTO Transactions VALUES ('{transaction_id}', '{customer_id}', '{employee_id}', '{total}', '{timestamp}')")
+        self.cursor.execute(f"INSERT INTO Transactions VALUES ('{transaction_id}', '{customer_id}', '{employee_id}', '{total}', '{timestamp}')")
         self.connection.commit()
 
     def db_itemize_transaction(self, transaction_id: str, plu, item_to_add: str, amount):
-        cursor = self.connection.cursor()
-        cursor.execute(f"INSERT INTO Itemizer VALUES ('{transaction_id}', '{plu}', '{item_to_add}', '{amount}')")
+        self.cursor.execute(f"INSERT INTO Itemizer VALUES ('{transaction_id}', '{plu}', '{item_to_add}', '{amount}')")
         self.connection.commit()
 
     def db_list_transactions(self):
-        cursor = self.connection.cursor()
-        transactions_list = cursor.execute(f"SELECT * FROM Transactions").fetchall()
+        transactions_list = self.cursor.execute(f"SELECT * FROM Transactions").fetchall()
         for transaction in transactions_list:
             print(transaction)
     
     def db_delete_transaction_id(self, transaction_id: str):
-        cursor = self.connection.cursor()
-        cursor.execute(f"DELETE FROM Transactions WHERE transaction_id = '{transaction_id}'")
-        cursor = self.connection.cursor()
-        cursor.execute(f"DELETE FROM Itemizer WHERE transaction_id = '{transaction_id}'")
+        self.cursor.execute(f"DELETE FROM Transactions WHERE transaction_id = '{transaction_id}'")
+        self.cursor.execute(f"DELETE FROM Itemizer WHERE transaction_id = '{transaction_id}'")
         self.connection.commit() 
 
     def db_delete_transactions_all(self):
-        cursor = self.connection.cursor()
-        cursor.execute(f"DELETE FROM Transactions")
-        cursor = self.connection.cursor()
-        cursor.execute(f"DELETE FROM Itemizer")
+        self.cursor.execute(f"DELETE FROM Transactions")
+        self.cursor.execute(f"DELETE FROM Itemizer")
         self.connection.commit()
 
-if __name__ == '__main__':
-    db_name = input('Enter DB name: ')
-    session = DatabaseSession(db_name)
+def database_selection_menu(db_name):
     print (f"Connect to DB '{db_name}'?")
     print ('1 - yes')
     print ('0 - no')
     connect_prompt = int(input())
+    return connect_prompt
+
+
+
+if __name__ == '__main__':
+    db_name = input('Enter DB name: ')
+    session = DatabaseSession(db_name)
+    connect_prompt = database_selection_menu(db_name)
     if connect_prompt == 1:
         session.connect_to_database()
-    print(f"Connected to DB '{db_name}'")
     while True:
         print(f'DB {db_name}.db')
         print()
