@@ -23,7 +23,7 @@ class DatabaseSession:
 
 #DATABASE MANAGEMENT
 
-    def list_tables(self):
+    def db_list_tables(self):
         table_list = self.cursor.execute(f"SELECT * FROM sqlite_master WHERE type='table';").fetchall()
         for table in table_list:
             print(table)
@@ -147,22 +147,391 @@ class DatabaseSession:
         self.cursor.execute(f"DELETE FROM Itemizer")
         self.connection.commit()
 
-def database_selection_menu(db_name):
-    print (f"Connect to DB '{db_name}'?")
-    print ('1 - yes')
-    print ('0 - no')
-    connect_prompt = int(input())
-    return connect_prompt
 
 
+#MENU CLASS
 
-if __name__ == '__main__':
-    db_name = input('Enter DB name: ')
-    session = DatabaseSession(db_name)
-    connect_prompt = database_selection_menu(db_name)
-    if connect_prompt == 1:
-        session.connect_to_database()
-    while True:
+class Menu:
+    def __init__(self) -> None:
+        self._header = ''
+        self._options = {
+            1: None, 
+            2: None, 
+            3: None, 
+            4: None, 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: None,
+            0: None
+        }
+
+    def __str__(self) -> str:
+        return self._header
+    
+    def list_options(self):
+        for option in self._options:
+            if self._options[option] == None:
+               continue
+            print(f'{option} - {self._options[option]}')
+
+    def choose_option(self):
+        option = int(input(''))
+        return self._options[option]
+
+    def execute(self):
+        global menu 
+        global option
+        menu = option
+
+#MAIN MENU
+
+class MainMenu(Menu):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = f'{db_name} - Main Menu'
+        self._options = {
+            1: MenuTransactionManagement(), 
+            2: MenuCustomerManagement(), 
+            3: MenuEmployeeManagement(), 
+            4: MenuItemManagement(), 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: MenuDatabaseManagement(),
+            0: None
+        }
+
+#TRANSACTION MANAGEMENT MENU
+
+class MenuTransactionManagement(Menu):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Transaction Management'
+        self._options = {
+            1: ListTransactions(), 
+            2: MenuCreateTransactions(), 
+            3: MenuDeleteTransactions(), 
+            4: None, 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: None,
+            0: None
+        }
+
+#CREATE TRANSACTIONS MENU
+
+class MenuCreateTransactions(Menu):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Create Transactions'
+        self._options = {
+            1: CreateTransactionCustom(), 
+            2: CreateTransactionRandom(), 
+            3: CreateTransactionMultiple(), 
+            4: None, 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: None,
+            0: None
+        }     
+
+#DELETE TRANSACTIONS MENU
+
+class MenuDeleteTransactions(Menu):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Delete Transactions'
+        self._options = {
+            1: None, 
+            2: None, 
+            3: None, 
+            4: None, 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: None,
+            0: None
+        }                
+#CUSTOMER MANAGEMENT MENU
+
+class MenuCustomerManagement(Menu):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Customer Management'
+        self._options = {
+            1: None, 
+            2: None, 
+            3: None, 
+            4: None, 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: None,
+            0: None
+        }
+
+#EMPLOYEE MANAGEMENT MENU
+
+class MenuEmployeeManagement(Menu):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Employee Management'
+        self._options = {
+            1: None, 
+            2: None, 
+            3: None, 
+            4: None, 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: None,
+            0: None
+        }
+
+#ITEM MANAGEMENT MENU
+
+class MenuItemManagement(Menu):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Item Management'
+        self._options = {
+            1: None, 
+            2: None, 
+            3: None, 
+            4: None, 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: None,
+            0: None
+        }            
+#DATABASE MANAGEMENT MENU
+
+class MenuDatabaseManagement(Menu):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Database Management'
+        self._options = {
+            1: MenuTableManagement(), 
+            2: None, 
+            3: None, 
+            4: None, 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: None,
+            0: None
+        }
+
+#TABLE MANAGEMENT MENU
+
+class MenuTableManagement(Menu):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Table Management'
+        self._options = {
+            1: ListTables(), 
+            2: MenuCreateTables(), 
+            3: None, 
+            4: None, 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: None,
+            0: None
+        }
+
+#CREATE TABLES MENU
+
+class MenuCreateTables(Menu):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Create Tables'
+        self._options = {
+            1: CreateTableTransactions(), 
+            2: CreateTableCustomers(), 
+            3: CreateTableEmployees(), 
+            4: CreateTableItems(), 
+            5: None, 
+            6: None, 
+            7: None, 
+            8: None, 
+            9: None,
+            0: None
+        }
+
+#Menu Item Class
+
+class MenuItem:
+    def __init__(self) -> None:
+        self._header = ''
+        self._function = None  
+
+    def __str__(self):
+        return self._header
+
+    def execute(self):
+        self._function()
+
+#List Transactions
+
+class ListTransactions(MenuItem):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'List Transactions'
+        self._function = session.db_list_transactions
+
+#Create Transactions
+    #Create Transaction Custom
+
+class CreateTransactionCustom(MenuItem):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Create Custom Transaction'
+        self._function = session.db_create_transaction
+    
+    def execute(self):
+        transaction_id = input('Transaction ID: ')
+        customer_id = int(input('Customer ID: '))
+        employee_id = input('Employee ID: ')
+        total = input('Total: ')
+        timestamp = datetime.now()
+        if timestamp == None:
+            timestamp = datetime.now()
+        self._function(transaction_id, customer_id, employee_id, total, timestamp)
+        print(f'Transaction {transaction_id} created')
+
+        while True:
+            item_to_add = input('Select item: ')
+            if item_to_add == '':
+                break
+            item_data = session.db_fetch_item_data(item_to_add)
+            amount_to_add = int(input('Amount: '))
+            for item in range(amount_to_add):
+                print(transaction_id, item_data[0], item_to_add, amount_to_add)
+                session.db_itemize_transaction(transaction_id, item_data[0], item_to_add, amount_to_add)
+
+    #Create Transaction Random
+
+class CreateTransactionRandom(MenuItem):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Create Random Transaction'
+        self._function = session.db_create_transaction
+
+    def execute(self):
+        transaction_id, customer_id, employee_id, total, timestamp = create_transaction(session.db_list_customer_id(), session.db_list_employee_id(), 5.00)
+        print(transaction_id, customer_id, employee_id, total, timestamp)
+        self._function(transaction_id, customer_id, employee_id, total, timestamp)
+        print(f'Transaction {transaction_id} created')
+        list_of_items = session.db_return_items()
+        choosen_items = randint(1, (len(list_of_items)))
+        for item in range(choosen_items):
+            item_data = choice(list_of_items)
+            amount = randint(1, 10)
+            session.db_itemize_transaction(transaction_id, item_data[0], item_data[1], amount)
+
+class CreateTransactionMultiple(MenuItem):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Create Multiple Transactions'
+        self._function = session.db_create_transaction
+
+    def execute(self):
+        transaction_number = int(input('Number of transactions: '))
+        if transaction_number == 0:
+            return
+        for number in range(transaction_number):
+            transaction_id, customer_id, employee_id, total, timestamp = create_transaction(session.db_list_customer_id(), session.db_list_employee_id(), 5.00)
+            print(transaction_id, customer_id, employee_id, total, timestamp)
+            self._function(transaction_id, customer_id, employee_id, total, timestamp)
+            print(f'Transaction {transaction_id} created')
+            list_of_items = session.db_return_items()
+            choosen_items = randint(1, len(list_of_items))
+            for item in range(choosen_items):
+                item_data = choice(list_of_items)
+                amount = randint(1, 10)
+                session.db_itemize_transaction(transaction_id, item_data[0], item_data[1], amount)
+    
+#List Tables
+
+class ListTables(MenuItem):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'List Tables'
+        self._function = session.db_list_tables
+
+#Create Tables
+    #Create Transactions Table
+
+class CreateTableTransactions(MenuItem):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Transactions Table'
+        self._function = session.db_create_transactions_table
+
+    #Create Customers Table
+
+class CreateTableCustomers(MenuItem):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Customers Table'
+        self._function = session.db_create_customers_table
+
+    #Create Employees Table
+
+class CreateTableEmployees(MenuItem):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Employees Table'
+        self._function = session.db_create_employees_table
+
+    #Create Items Table
+
+class CreateTableItems(MenuItem):
+    def __init__(self) -> None:
+        super().__init__()
+        self._header = 'Items Table'
+        self._function = session.db_create_items_table
+
+#MAIN
+db_name = input('Enter DB name: ')
+session = DatabaseSession(db_name)
+
+print (f"Connect to DB '{db_name}'?")
+print ('1 - yes')
+print ('0 - no')
+
+connect_prompt = int(input())
+
+if connect_prompt == 1:
+    session.connect_to_database()
+elif connect_prompt == 0:
+    exit()
+
+menu = MainMenu()
+while True:
+    print(menu)
+    menu.list_options()
+    option = menu.choose_option()
+    option.execute()
+
+    
+        
+while True:
         print(f'DB {db_name}.db')
         print()
         print('1 - transactions')
@@ -208,8 +577,8 @@ if __name__ == '__main__':
                                 amount_to_add = int(input('Amount: '))
                                 for item in range(amount_to_add):
                                     print(transaction_id, item_data[0], item_to_add, amount_to_add)
-                                    session.db_itemize_transaction(transaction_id, item_data[0], item_to_add, amount_to_add)
-                        elif transaction_creation_prompt == 2:
+                                    session.db_itemizetransaction(transaction_id, item_data[0], item_to_add, amount_to_add)
+                        elif transaction_creation_pro_mpt == 2:
                             transaction_id, customer_id, employee_id, total, timestamp = create_transaction(session.db_list_customer_id(), session.db_list_employee_id(), 5.00)
                             print(transaction_id, customer_id, employee_id, total, timestamp)
                             session.db_create_transaction(transaction_id, customer_id, employee_id, total, timestamp)
