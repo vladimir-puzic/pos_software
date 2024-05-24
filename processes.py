@@ -1,3 +1,6 @@
+#Experimental feature for automatically generating transactions. Meant to simulate POS workload
+#File needs cleaning
+
 import time
 import sqlite3
 from people import create_employee, create_customer
