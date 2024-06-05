@@ -2,7 +2,8 @@ import sqlite3
 from people import create_employee, create_customer
 from transactions import create_transaction
 from datetime import date, datetime
-from random import choice, randint
+from random import choice, choices, randint, seed
+from string import ascii_lowercase
 
 class DatabaseSession:
     def __init__(self, db_name: str):
@@ -16,7 +17,7 @@ class DatabaseSession:
     def connect_to_database(self):
         self.connection = sqlite3.connect(f'{self._db_name}.db')
         self.cursor = self.connection.cursor()
-        print(f"Connected to DB '{db_name}'")
+        print(f"Connected to DB '{self._db_name}'")
 
     def return_db_name(self):
         return self._db_name
@@ -28,6 +29,9 @@ class DatabaseSession:
         for table in table_list:
             print(table)
             print()
+
+    def db_create_users_table(self):
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS Users ('employee_id' TEXT, 'password' TEXT, 'access_level' INTEGER)")
 
     def db_create_employees_table(self):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Employees ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'phone_number' INTEGER, 'employee_id' TEXT)")
@@ -42,9 +46,31 @@ class DatabaseSession:
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Transactions ('transaction_id' TEXT, 'customer_id' INTAGER, 'employee_id' TEXT, 'total' FLOAT, 'timestamp' DATETIME)")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Itemizer ('transaction_id' TEXT, 'plu' INTAGER, 'item_name' TEXT, 'amount' INTAGER)")
 
+
     def db_drop_table(self, table_name: str):
         self.cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
 
+#USER MANAGEMENT
+
+    def db_create_user(self, employee_id: str, password: str, access_level: int):
+        self.cursor.execute(f"INSERT INTO Users VALUES ('{employee_id}', '{password}', '{access_level}')")
+        self.connection.commit()
+
+    def db_check_user(self, employee_id: str):
+        user_list = self.cursor.execute(f"SELECT employee_id FROM Users").fetchall()
+        for index, item in enumerate(user_list):
+            user_list[index] = item[0]
+
+        if employee_id in user_list:
+            return True
+        return False
+
+    def db_check_password(self, pw_key: str, employee_id: str):
+        db_key = self.cursor.execute(f"SELECT password FROM Users WHERE employee_id='{employee_id}'").fetchall()
+        db_key = db_key[0][0]
+        if db_key == pw_key:
+            return True
+        return False
 #EMPLOYEE MANAGEMENT
 
     def db_create_employee(self, f_name: str, l_name: str, gender: str, phone_no: int, employee_id: str):
@@ -921,7 +947,62 @@ class CreateTableItems(MenuItem):
         self._header = 'Items Table'
         self._function = session.db_create_items_table
 
+#LOGIN
+def login():
+    session = DatabaseSession('users')
+    session.connect_to_database()
+    session.db_create_users_table()
+
+    employee_id = input('Employee ID: ')
+    password = input('Password: ')
+
+    if session.db_check_user(employee_id) == False:
+        create_user(employee_id, session)
+        return
+    
+    pw_key = generate_key(password)
+    auth = session.db_check_password(pw_key, employee_id)
+
+    return auth
+
+def generate_key(password):
+    seed(password)
+    char_list = choices(ascii_lowercase, k=16)
+    pw_key = ''.join(char_list)
+
+    return pw_key
+
+def create_user(employee_id, session):
+    print(f'Employee {employee_id} does not exist.')
+    print(f'Do you want to create a new user account?')
+    print ('1 - yes')
+    print ('0 - no')
+    create_user_prompt = int(input(''))
+
+    if create_user_prompt == 0:
+        return
+    
+    print(f'Enter the password for {employee_id}')
+    password = input('')
+    pw_key = generate_key(password)
+
+    print(f'Enter desired access level:')
+    print('1 - Cashier')
+    print('2 - Manager')
+    print('3 - Administrator')
+    access_level = int(input(''))
+
+    session.db_create_user(employee_id, pw_key, access_level)
+
 #MAIN
+    #LOGIN
+
+if login() == False:
+    print('Incorrect Employee ID or password')
+    exit()
+print('Login successfull')
+
+    #DB SESSION
 db_name = input('Enter DB name: ')
 session = DatabaseSession(db_name)
 
