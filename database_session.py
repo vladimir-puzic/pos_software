@@ -420,7 +420,7 @@ class DeleteTransactionAll(MenuItem):
     def __init__(self) -> None:
         super().__init__()
         self._header = 'Delete All Transactions'
-        self._function = session.db_delete_transactions_all()
+        self._function = session.db_delete_transactions_all
     
     def execute(self):
         self._function()
