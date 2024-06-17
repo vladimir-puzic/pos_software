@@ -6,22 +6,26 @@ from random import choice, choices, randint, seed
 from string import ascii_lowercase
 
 class DatabaseSession:
-    def __init__(self, db_name: str):
+    def __init__(self, db_name: str, user_id: str):
         self._db_name = db_name
         self.connection = None
         self.cursor = None
-        self._user = None
+        self._user = user_id
 
 #SESSION MANAGEMENT
 
     def connect_to_database(self):
         self.connection = sqlite3.connect(f'{self._db_name}.db')
         self.cursor = self.connection.cursor()
+        log.write(f"{datetime.now()} [{self._user}] (connect_to_database) - Connected to DB '{self._db_name}\n")
         print(f"Connected to DB '{self._db_name}'")
 
     def return_db_name(self):
         return self._db_name
 
+    def return_current_user(self):
+        return self._user
+    
 #DATABASE MANAGEMENT
 
     def db_list_tables(self):
@@ -29,26 +33,36 @@ class DatabaseSession:
         for table in table_list:
             print(table)
             print()
+        log.write(f"{datetime.now()} [{self._user}] (db_list_tables) - Listed existing tables\n")
 
     def db_create_users_table(self):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Users ('employee_id' TEXT, 'password' TEXT, 'access_level' INTEGER)")
+        log.write(f"{datetime.now()} (db_create_users_table) - Created 'Users' table\n")
+        self.cursor.execute(f"INSERT INTO Users VALUES ('vp123456', '{generate_key('123456')}', '3')")
+        self.connection.commit()
+        log.write(f"{datetime.now()} (db_create_users_table) - Created admin user\n")
 
     def db_create_employees_table(self):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Employees ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'phone_number' INTEGER, 'employee_id' TEXT)")
-    
+        log.write(f"{datetime.now()} [{self._user}] (db_create_employees_table) - Created 'Employees' table\n")
+
     def db_create_customers_table(self):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Customers ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'date_of_birth' DATE, 'customer_id' INTEGER)")
-   
+        log.write(f"{datetime.now()} [{self._user}] (db_create_customers_table) - Created 'Customers' table\n")
+
     def db_create_items_table(self):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Items ('plu' INTAGER, 'name' TEXT, 'type' TEXT, 'weight' FLOAT, 'price' FLOAT)")
+        log.write(f"{datetime.now()} [{self._user}] (db_create_items_table) - Created 'Items' table\n")
 
     def db_create_transactions_table(self):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Transactions ('transaction_id' TEXT, 'customer_id' INTAGER, 'employee_id' TEXT, 'total' FLOAT, 'timestamp' DATETIME)")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Itemizer ('transaction_id' TEXT, 'plu' INTAGER, 'item_name' TEXT, 'amount' INTAGER)")
+        log.write(f"{datetime.now()} [{self._user}] (db_create_transactions_table) - Created 'Transactions' and 'Itemizer' table\n")
 
 
     def db_drop_table(self, table_name: str):
         self.cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+        log.write(f"{datetime.now()} [{self._user}] (db_drop_table) - Dropped '{table_name}' table\n")
 
 #USER MANAGEMENT
 
@@ -62,15 +76,20 @@ class DatabaseSession:
             user_list[index] = item[0]
 
         if employee_id in user_list:
+            log.write(f'{datetime.now()} (db_check_user) - User check succeded for {employee_id}\n')
             return True
+        log.write(f'{datetime.now()} (db_check_user) - User check failed for {employee_id}\n')
         return False
 
     def db_check_password(self, pw_key: str, employee_id: str):
         db_key = self.cursor.execute(f"SELECT password FROM Users WHERE employee_id='{employee_id}'").fetchall()
         db_key = db_key[0][0]
         if db_key == pw_key:
+            log.write(f'{datetime.now()} (db_check_password) - Password check succeded\n')
             return True
+        log.write(f'{datetime.now()} (db_check_password) - Password check failed\n')
         return False
+    
 #EMPLOYEE MANAGEMENT
 
     def db_create_employee(self, f_name: str, l_name: str, gender: str, phone_no: int, employee_id: str):
@@ -949,21 +968,25 @@ class CreateTableItems(MenuItem):
 
 #LOGIN
 def login():
-    session = DatabaseSession('users')
-    session.connect_to_database()
-    session.db_create_users_table()
+    login_session = DatabaseSession('users', None)
+    login_session.connect_to_database()
+    login_session.db_create_users_table()
+    log.write(f'{datetime.now()} (login) - Login verification session initiated for users.db\n')
 
-    employee_id = input('Employee ID: ')
+    login_employee_id = input('Employee ID: ')
     password = input('Password: ')
+    log.write(f'{datetime.now()} (login) - Login attempt made with {login_employee_id} / {password}\n')
 
-    if session.db_check_user(employee_id) == False:
-        create_user(employee_id, session)
-        return
+
+    if login_session.db_check_user(login_employee_id) == False:
+        log.write(f'{datetime.now()} (login) - Login failed with {login_employee_id} / {password}\n')
+        log.write(f'{datetime.now()} (login) - App shutting down\n')
+        exit()
     
     pw_key = generate_key(password)
-    auth = session.db_check_password(pw_key, employee_id)
+    auth = login_session.db_check_password(pw_key, login_employee_id)
 
-    return auth
+    return auth, login_employee_id
 
 def generate_key(password):
     seed(password)
@@ -997,29 +1020,41 @@ def create_user(employee_id, session):
 #MAIN
     #LOGIN
 
-# if login() == False:
-#     print('Incorrect Employee ID or password')
-#     exit()
-# print('Login successfull')
+with open(f'{(datetime.now()).strftime("%d.%m.%Y")}.log', 'a') as log:
+    log.write(f'{datetime.now()} - App logging initiated\n')
+    auth, user_id = login()
 
-    #DB SESSION
-db_name = input('Enter DB name: ')
-session = DatabaseSession(db_name)
+    if auth == False:
+        log.write(f'{datetime.now()} - Wrong password entered\n')
+        print('Incorrect Employee ID or password')
 
-print (f"Connect to DB '{db_name}'?")
-print ('1 - yes')
-print ('0 - no')
+        log.write(f'{datetime.now()} - App shutting down\n')
+        exit()
+    log.write(f'{datetime.now()} - Login successfull\n')
+    print('Login successfull')
+    
 
-connect_prompt = int(input())
+        #DB SESSION
+    db_name = input('Enter DB name: ')
+    session = DatabaseSession(db_name, user_id)
 
-if connect_prompt == 1:
-    session.connect_to_database()
-elif connect_prompt == 0:
-    exit()
+    print (f"Connect to DB '{db_name}'?")
+    print ('1 - yes')
+    print ('0 - no')
+    
 
-menu = MainMenu()
-while True:
-    print(menu)
-    menu.list_options()
-    option = menu.choose_option()
-    option.execute()
+    connect_prompt = int(input())
+
+    if connect_prompt == 1:
+        session.connect_to_database()
+    elif connect_prompt == 0:
+        log.write(f'{datetime.now()} - App shutting down\n')
+        exit()
+        
+    log.write(f'{datetime.now()} - Session initiated for {db_name}\n')
+    menu = MainMenu()
+    while True:
+        print(menu)
+        menu.list_options()
+        option = menu.choose_option()
+        option.execute()
