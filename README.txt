@@ -12,7 +12,7 @@ Features:
 + Item Management
 + Transaction Management
 + Menu system
-- User Accounts
++ User Accounts
 - Application logging
 - Error handling
 - GUI

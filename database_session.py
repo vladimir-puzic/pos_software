@@ -137,7 +137,7 @@ class DatabaseSession:
         return item_plu_list
     
     def db_fetch_item_data(self, item_name):
-        item_data = self.cursor.execute(f"SELECT * FROM Items WHERE name='{item_name}'").fetchall()
+        item_data = self.cursor.execute(f"SELECT * FROM Items WHERE name='{item_name}'").fetchone()
         return item_data
     
     def db_delete_item_name(self, name: str):
@@ -354,8 +354,8 @@ class CreateTransactionCustom(MenuItem):
             item_data = session.db_fetch_item_data(item_to_add)
             amount_to_add = int(input('Amount: '))
             for item in range(amount_to_add):
-                print(transaction_id, item_data[0], item_to_add, amount_to_add)
-                session.db_itemize_transaction(transaction_id, item_data[0], item_to_add, amount_to_add)
+                print(transaction_id, item_data[0], item_data[1], amount_to_add)
+                session.db_itemize_transaction(transaction_id, item_data[0], item_data[1], amount_to_add)
 
     #Create Transaction Random
 
@@ -997,10 +997,10 @@ def create_user(employee_id, session):
 #MAIN
     #LOGIN
 
-if login() == False:
-    print('Incorrect Employee ID or password')
-    exit()
-print('Login successfull')
+# if login() == False:
+#     print('Incorrect Employee ID or password')
+#     exit()
+# print('Login successfull')
 
     #DB SESSION
 db_name = input('Enter DB name: ')
