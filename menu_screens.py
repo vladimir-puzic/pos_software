@@ -9,7 +9,7 @@ from database_management import *
 #MENU CLASS
 
 class Menu:
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         self._header = ''
         self._options = {
             1: None, 
@@ -37,21 +37,21 @@ class Menu:
         option = int(input(''))
         return self._options[option]
 
-    def execute(self):
+    def execute(self, db_name, *args):
         s.s_menu = s.s_option
         pass
 
 #Menu Item Class
 
 class MenuItem:
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         self._header = ''
         self._function = None  
 
     def __str__(self):
         return self._header
 
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #UTILITY FUNCTIONS
@@ -62,8 +62,8 @@ class MenuReturn(MenuItem):
         self._header = f'Return - ' + str(return_menu)
         self._menu = return_menu
 
-    def execute(self):
-        session.menu = self._menu()
+    def execute(self, db_name, *args):
+        s.s_menu = self._menu(db_name)
 
 #MAIN MENU
 
@@ -89,7 +89,7 @@ class MainMenu(Menu):
 #TRANSACTION MANAGEMENT MENU
 
 class MenuTransactionManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Transaction Management'
         self._options = {
@@ -108,7 +108,7 @@ class MenuTransactionManagement(Menu):
 #CREATE TRANSACTIONS MENU
 
 class MenuCreateTransactions(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Transactions'
         self._options = {
@@ -127,7 +127,7 @@ class MenuCreateTransactions(Menu):
 #DELETE TRANSACTIONS MENU
 
 class MenuDeleteTransactions(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Transactions'
         self._options = {
@@ -148,24 +148,24 @@ class MenuDeleteTransactions(Menu):
 #List Transactions
 
 class ListTransactions(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'List Transactions'
         self._function = db_list_transactions
 
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #Create Transactions
     #Create Transaction Custom
 
 class CreateTransactionCustom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Custom Transaction'
         self._function = db_create_transaction
     
-    def execute(self):
+    def execute(self, *args):
         transaction_id = input('Transaction ID: ')
         customer_id = int(input('Customer ID: '))
         employee_id = input('Employee ID: ')
@@ -189,12 +189,12 @@ class CreateTransactionCustom(MenuItem):
     #Create Transaction Random
 
 class CreateTransactionRandom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Random Transaction'
         self._function = db_create_transaction
 
-    def execute(self):
+    def execute(self, *args):
         transaction_id, customer_id, employee_id, total, timestamp = create_transaction(db_list_customer_id(), db_list_employee_id(), 5.00)
         print(transaction_id, customer_id, employee_id, total, timestamp)
         self._function(transaction_id, customer_id, employee_id, total, timestamp)
@@ -209,12 +209,12 @@ class CreateTransactionRandom(MenuItem):
     #Create Transaction Multiple
     
 class CreateTransactionMultiple(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Multiple Transactions'
         self._function = db_create_transaction
 
-    def execute(self):
+    def execute(self, *args):
         transaction_number = int(input('Number of transactions: '))
         if transaction_number == 0:
             return
@@ -234,24 +234,24 @@ class CreateTransactionMultiple(MenuItem):
     #Delete Transaction via ID
 
 class DeleteTransactionID(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Transaction via ID'
         self._function = db_delete_transaction_id
 
-    def execute(self):
+    def execute(self, *args):
         transaction_id_prompt = input('Enter Transaction ID: ')
         self._function(transaction_id_prompt)
 
     #Delete Transaction All
 
 class DeleteTransactionAll(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete All Transactions'
         self._function = db_delete_transactions_all
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #CUSTOMERS
@@ -259,7 +259,7 @@ class DeleteTransactionAll(MenuItem):
 #CUSTOMER MANAGEMENT MENU
 
 class MenuCustomerManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Customer Management'
         self._options = {
@@ -278,7 +278,7 @@ class MenuCustomerManagement(Menu):
 #CREATE CUSTOMERS MENU
 
 class MenuCreateCustomer(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Customers'
         self._options = {
@@ -297,7 +297,7 @@ class MenuCreateCustomer(Menu):
 #DELETE CUSTOMERS MENU
 
 class MenuDeleteCustomer(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Customers'
         self._options = {
@@ -318,24 +318,24 @@ class MenuDeleteCustomer(Menu):
 #List Customers
 
 class ListCustomers(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'List Customers'
         self._function = db_list_customers
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #Create Customers
     #Create Customer Custom
 
 class CreateCustomerCustom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Custom Customer'
         self._function = db_create_customer
     
-    def execute(self):
+    def execute(self, *args):
         f_name = input('First name: ')
         l_name = input('Last name: ')
         gender = input('Gender: ')
@@ -349,12 +349,12 @@ class CreateCustomerCustom(MenuItem):
     #Create Customer Random
 
 class CreateCustomerRandom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Random Customer'
         self._function = db_create_customer
     
-    def execute(self):
+    def execute(self, *args):
         f_name, l_name, gender, dob, customer_id = create_customer()
         print (f_name, l_name, gender, dob, customer_id)
         self._function(f_name, l_name, gender, dob, customer_id)
@@ -362,12 +362,12 @@ class CreateCustomerRandom(MenuItem):
     #Create Customer Multiple
 
 class CreateCustomerMultiple(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Multiple Customers'
         self._function = db_create_customer
     
-    def execute(self):    
+    def execute(self, *args):    
         customer_number = int(input('Number of customers: '))
         if customer_number == 0:
             return
@@ -380,24 +380,24 @@ class CreateCustomerMultiple(MenuItem):
     #Delete Customer via ID
 
 class DeleteCustomerID(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Customer via ID'
         self._function = db_delete_customer_id
 
-    def execute(self):
+    def execute(self, *args):
         customer_id_prompt = int(input('Enter Customer ID: '))
         self._function(customer_id_prompt)
 
     #Delete Customer All
 
 class DeleteCustomerAll(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete All Customers'
         self._function = db_delete_customer_all
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #EMPLOYEES
@@ -405,7 +405,7 @@ class DeleteCustomerAll(MenuItem):
 #EMPLOYEE MANAGEMENT MENU
 
 class MenuEmployeeManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Employee Management'
         self._options = {
@@ -424,7 +424,7 @@ class MenuEmployeeManagement(Menu):
 #CREATE EMPLOYEES MENU
 
 class MenuCreateEmployee(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Employees'
         self._options = {
@@ -443,7 +443,7 @@ class MenuCreateEmployee(Menu):
 #DELETE EMPLOYEES MENU
 
 class MenuDeleteEmployees(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Employees'
         self._options = {
@@ -464,24 +464,24 @@ class MenuDeleteEmployees(Menu):
 #List Employees
 
 class ListEmployees(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'List Employees'
         self._function = db_list_employees
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #Create Employees
     #Create Employees Custom
 
 class CreateEmployeeCustom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Custom Employee'
         self._function = db_create_employee
     
-    def execute(self):
+    def execute(self, *args):
         f_name = input('First name: ')
         l_name = input('Last name: ')
         gender = input('Gender: ')
@@ -492,12 +492,12 @@ class CreateEmployeeCustom(MenuItem):
     #Create Employee Random
 
 class CreateEmployeeRandom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Random Employe'
         self._function = db_create_employee
     
-    def execute(self):
+    def execute(self, *args):
         f_name, l_name, gender, phone_no, employee_id = create_employee()
         print (f_name, l_name, gender, phone_no, employee_id)
         self._function(f_name, l_name, gender, phone_no, employee_id)  
@@ -505,12 +505,12 @@ class CreateEmployeeRandom(MenuItem):
     #Create Employee Multiple
 
 class CreateEmployeeMultiple(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Multiple Employees'
         self._function = db_create_employee
     
-    def execute(self):
+    def execute(self, *args):
         employee_number = int(input('Number of employees: '))
         if employee_number == 0:
             return
@@ -523,24 +523,24 @@ class CreateEmployeeMultiple(MenuItem):
     #Delete Employee via ID
 
 class DeleteEmployeeID(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Employee via ID'
         self._function = db_delete_employee_id
     
-    def execute(self):
+    def execute(self, *args):
         employee_id_prompt = input('Enter Employee ID: ')
         self._function(employee_id_prompt)        
 
     #Delete Employee All
 
 class DeleteEmployeeAll(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete All Employees'
         self._function = db_delete_employee_all
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #ITEMS
@@ -548,7 +548,7 @@ class DeleteEmployeeAll(MenuItem):
 #ITEM MANAGEMENT MENU
 
 class MenuItemManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Item Management'
         self._options = {
@@ -567,7 +567,7 @@ class MenuItemManagement(Menu):
 #CREATE ITEMS MENU
 
 class MenuCreateItems(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Items'
         self._options = {
@@ -586,7 +586,7 @@ class MenuCreateItems(Menu):
 #DELETE ITEMS MENU
 
 class MenuDeleteItems(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Items'
         self._options = {
@@ -607,24 +607,24 @@ class MenuDeleteItems(Menu):
 #List Items
 
 class ListItems(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'List Items'
         self._function = db_list_items
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #Create Items
     #Create Custom Item
 
 class CreateItemCustom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Custom Item'
         self._function = db_create_item
     
-    def execute(self):
+    def execute(self, *args):
         plu = int(input('Item PLU: '))
         name = input('Item name:')
         type = input('Type: ')
@@ -635,12 +635,12 @@ class CreateItemCustom(MenuItem):
     #Create Standard List Item
 
 class CreateItemStandardList(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Standard List of Items'
         self._function = db_create_item
     
-    def execute(self):
+    def execute(self, *args):
         milk = (644455, 'Milk', 'Dairy', 1, 2.50)
         eggs = (994111, 'Eggs', 'Dairy' , 0.5, 3.00)                           
         cheese = (222449, 'Cheese', 'Dairy', 1, 10.00)
@@ -658,30 +658,30 @@ class CreateItemStandardList(MenuItem):
     #Delete Items via Name
 
 class DeleteItemName(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Item via Name'
         self._function = db_delete_item_name
     
-    def execute(self):
+    def execute(self, *args):
         item_name_prompt = input('Enter Item Name:')
         self._function(item_name_prompt)
         
     #Delete Items All
 
 class DeleteItemAll(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete All Items'
         self._function = db_delete_item_all
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #DATABASE MANAGEMENT MENU
 
 class MenuDatabaseManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Database Management'
         self._options = {
@@ -700,7 +700,7 @@ class MenuDatabaseManagement(Menu):
 #TABLE MANAGEMENT MENU
 
 class MenuTableManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Table Management'
         self._options = {
@@ -719,7 +719,7 @@ class MenuTableManagement(Menu):
 #CREATE TABLES MENU
 
 class MenuCreateTables(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Tables'
         self._options = {
@@ -738,7 +738,7 @@ class MenuCreateTables(Menu):
 #List Tables
 
 class ListTables(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'List Tables'
         self._function = db_list_tables
@@ -747,7 +747,7 @@ class ListTables(MenuItem):
     #Create Transactions Table
 
 class CreateTableTransactions(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Transactions Table'
         self._function = db_create_transactions_table
@@ -755,7 +755,7 @@ class CreateTableTransactions(MenuItem):
     #Create Customers Table
 
 class CreateTableCustomers(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Customers Table'
         self._function = db_create_customers_table
@@ -763,7 +763,7 @@ class CreateTableCustomers(MenuItem):
     #Create Employees Table
 
 class CreateTableEmployees(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Employees Table'
         self._function = db_create_employees_table
@@ -771,7 +771,7 @@ class CreateTableEmployees(MenuItem):
     #Create Items Table
 
 class CreateTableItems(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Items Table'
         self._function = db_create_items_table
