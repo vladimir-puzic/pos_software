@@ -2,7 +2,8 @@ from datetime import date, datetime
 from random import choice, choices, randint, seed
 from string import ascii_lowercase
 
-import database_session
+import session as s
+import database_management
 from menu_screens import MainMenu
 
 #LOGIN
@@ -63,9 +64,9 @@ from menu_screens import MainMenu
 
 
     #DB SESSION
-db_name = input('Enter DB name: ')
+s.s_db_name = input('Enter DB name: ')
 
-print (f"Connect to DB '{db_name}'?")
+print (f"Connect to DB '{s.s_db_name}'?")
 print ('1 - yes')
 print ('0 - no')
 
@@ -73,13 +74,13 @@ print ('0 - no')
 connect_prompt = int(input())
 
 if connect_prompt == 1:
-    database_session.connect_to_database(db_name)
+    database_management.connect_to_database(s.s_db_name)
 elif connect_prompt == 0:
     exit()
 
-menu = MainMenu(db_name)
+s.s_menu = MainMenu(s.s_db_name)
 while True:
-    print(menu)
-    menu.list_options()
-    option = menu.choose_option()
-    option.execute(option, menu)
+    print(s.s_menu)
+    s.s_menu.list_options()
+    s.s_option = s.s_menu.choose_option()
+    s.s_option.execute()

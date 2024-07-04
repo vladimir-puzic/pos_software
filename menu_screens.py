@@ -3,7 +3,9 @@ from transactions import create_transaction
 from datetime import date, datetime
 from random import choice, choices, randint, seed
 
-from database_session import *
+import session as s
+from database_management import *
+
 #MENU CLASS
 
 class Menu:
@@ -35,8 +37,9 @@ class Menu:
         option = int(input(''))
         return self._options[option]
 
-    def execute(self, option, menu):
-        menu = option
+    def execute(self):
+        s.s_menu = s.s_option
+        pass
 
 #Menu Item Class
 
@@ -60,8 +63,7 @@ class MenuReturn(MenuItem):
         self._menu = return_menu
 
     def execute(self):
-        global menu 
-        menu = self._menu()
+        session.menu = self._menu()
 
 #MAIN MENU
 
