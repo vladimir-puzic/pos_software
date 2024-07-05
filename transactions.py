@@ -1,6 +1,5 @@
 #file contains code for creating Items and Transactions
 
-from people import Person, Customer, Employee
 from datetime import datetime
 from random import randint, choice
 
