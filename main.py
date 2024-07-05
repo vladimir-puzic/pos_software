@@ -1,19 +1,19 @@
 from datetime import date, datetime
-from random import choice, choices, randint, seed
-from string import ascii_lowercase
+
 
 import session as s
 import database_management
 from menu_screens import MainMenu
+from login import login
 
 #MAIN
     #LOGIN
-# auth, user_id = login()
+auth, user_id = login()
 
-# if auth == False:
-#     print('Incorrect Employee ID or password')
-#     exit()
-# print('Login successfull')
+if auth == False:
+    print('Incorrect Employee ID or password')
+    exit()
+print('Login successfull')
 
 
     #DB SESSION

@@ -25,8 +25,8 @@ def db_list_tables():
         print()
 
 def db_create_users_table():
-    s.s_.execute("CREATE TABLE IF NOT EXISTS Users ('employee_id' TEXT, 'password' TEXT, 'access_level' INTEGER)")
-    s.s_cursor.execute(f"INSERT INTO Users VALUES ('vp123456', '{generate_key('123456')}', '3')")
+    s.s_cursor.execute("CREATE TABLE IF NOT EXISTS Users ('employee_id' TEXT, 'password' TEXT, 'access_level' INTEGER, UNIQUE(employee_id))")
+    s.s_cursor.execute(f"INSERT OR IGNORE INTO Users VALUES ('vp123456', 'zyfoksvpsyeddagw', '3')")
     s.s_connection.commit()
 
 def db_create_employees_table():

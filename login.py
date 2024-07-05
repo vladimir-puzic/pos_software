@@ -1,18 +1,21 @@
+import database_management
+from random import choice, choices, randint, seed
+from string import ascii_lowercase
+from os import path
+
 #LOGIN
 def login():
-    database_session.connect_to_database('users')
-    database_session.db_create_users_table()
+    database_management.connect_to_database('users')
+    database_management.db_create_users_table()
 
     login_employee_id = input('Employee ID: ')
     password = input('Password: ')
 
-
-
-    if database_session.db_check_user(login_employee_id) == False:
+    if database_management.db_check_user(login_employee_id) == False:
         exit()
     
     pw_key = generate_key(password)
-    auth = database_session.db_check_password(pw_key, login_employee_id)
+    auth = database_management.db_check_password(pw_key, login_employee_id)
 
     return auth, login_employee_id
 
