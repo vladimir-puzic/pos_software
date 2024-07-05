@@ -1,203 +1,17 @@
-import sqlite3
+#file contains code for managing the menu system
+
 from people import create_employee, create_customer
 from transactions import create_transaction
 from datetime import date, datetime
-from random import choice, choices, randint, seed
-from string import ascii_lowercase
+from random import choice, randint
 
-class DatabaseSession:
-    def __init__(self, db_name: str, user_id: str):
-        self._db_name = db_name
-        self.connection = None
-        self.cursor = None
-        self._user = user_id
-
-#SESSION MANAGEMENT
-
-    def connect_to_database(self):
-        self.connection = sqlite3.connect(f'{self._db_name}.db')
-        self.cursor = self.connection.cursor()
-        log.write(f"{datetime.now()} [{self._user}] (connect_to_database) - Connected to DB '{self._db_name}\n")
-        print(f"Connected to DB '{self._db_name}'")
-
-    def return_db_name(self):
-        return self._db_name
-
-    def return_current_user(self):
-        return self._user
-    
-#DATABASE MANAGEMENT
-
-    def db_list_tables(self):
-        table_list = self.cursor.execute(f"SELECT * FROM sqlite_master WHERE type='table';").fetchall()
-        for table in table_list:
-            print(table)
-            print()
-        log.write(f"{datetime.now()} [{self._user}] (db_list_tables) - Listed existing tables\n")
-
-    def db_create_users_table(self):
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS Users ('employee_id' TEXT, 'password' TEXT, 'access_level' INTEGER)")
-        log.write(f"{datetime.now()} (db_create_users_table) - Created 'Users' table\n")
-        self.cursor.execute(f"INSERT INTO Users VALUES ('vp123456', '{generate_key('123456')}', '3')")
-        self.connection.commit()
-        log.write(f"{datetime.now()} (db_create_users_table) - Created admin user\n")
-
-    def db_create_employees_table(self):
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS Employees ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'phone_number' INTEGER, 'employee_id' TEXT)")
-        log.write(f"{datetime.now()} [{self._user}] (db_create_employees_table) - Created 'Employees' table\n")
-
-    def db_create_customers_table(self):
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS Customers ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'date_of_birth' DATE, 'customer_id' INTEGER)")
-        log.write(f"{datetime.now()} [{self._user}] (db_create_customers_table) - Created 'Customers' table\n")
-
-    def db_create_items_table(self):
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS Items ('plu' INTAGER, 'name' TEXT, 'type' TEXT, 'weight' FLOAT, 'price' FLOAT)")
-        log.write(f"{datetime.now()} [{self._user}] (db_create_items_table) - Created 'Items' table\n")
-
-    def db_create_transactions_table(self):
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS Transactions ('transaction_id' TEXT, 'customer_id' INTAGER, 'employee_id' TEXT, 'total' FLOAT, 'timestamp' DATETIME)")
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS Itemizer ('transaction_id' TEXT, 'plu' INTAGER, 'item_name' TEXT, 'amount' INTAGER)")
-        log.write(f"{datetime.now()} [{self._user}] (db_create_transactions_table) - Created 'Transactions' and 'Itemizer' table\n")
-
-
-    def db_drop_table(self, table_name: str):
-        self.cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
-        log.write(f"{datetime.now()} [{self._user}] (db_drop_table) - Dropped '{table_name}' table\n")
-
-#USER MANAGEMENT
-
-    def db_create_user(self, employee_id: str, password: str, access_level: int):
-        self.cursor.execute(f"INSERT INTO Users VALUES ('{employee_id}', '{password}', '{access_level}')")
-        self.connection.commit()
-
-    def db_check_user(self, employee_id: str):
-        user_list = self.cursor.execute(f"SELECT employee_id FROM Users").fetchall()
-        for index, item in enumerate(user_list):
-            user_list[index] = item[0]
-
-        if employee_id in user_list:
-            log.write(f'{datetime.now()} (db_check_user) - User check succeded for {employee_id}\n')
-            return True
-        log.write(f'{datetime.now()} (db_check_user) - User check failed for {employee_id}\n')
-        return False
-
-    def db_check_password(self, pw_key: str, employee_id: str):
-        db_key = self.cursor.execute(f"SELECT password FROM Users WHERE employee_id='{employee_id}'").fetchall()
-        db_key = db_key[0][0]
-        if db_key == pw_key:
-            log.write(f'{datetime.now()} (db_check_password) - Password check succeded\n')
-            return True
-        log.write(f'{datetime.now()} (db_check_password) - Password check failed\n')
-        return False
-    
-#EMPLOYEE MANAGEMENT
-
-    def db_create_employee(self, f_name: str, l_name: str, gender: str, phone_no: int, employee_id: str):
-        self.cursor.execute(f"INSERT INTO Employees VALUES ('{f_name}', '{l_name}', '{gender}', '{phone_no}', '{employee_id}')")
-        self.connection.commit()
-
-    def db_list_employees(self):
-        employees_list = self.cursor.execute(f"SELECT * FROM Employees").fetchall()
-        for employee in employees_list:
-            print(employee)
-    
-    def db_list_employee_id(self):
-        employee_id_list = self.cursor.execute(f"SELECT employee_id FROM Employees").fetchall()
-        return employee_id_list
-    
-    def db_delete_employee_id(self, employee_id: str):
-        self.cursor.execute(f"DELETE FROM Employees WHERE employee_id = '{employee_id}'")
-        self.connection.commit()    
-
-    def db_delete_employee_all(self):
-        self.cursor.execute(f"DELETE FROM Employees")
-        self.connection.commit()       
-
-#CUSTOMER MANAGEMENT
-
-    def db_create_customer(self, f_name: str, l_name: str, gender: str, dob: date, customer_id: int):
-        self.cursor.execute(f"INSERT INTO Customers VALUES ('{f_name}', '{l_name}', '{gender}', '{dob}', '{customer_id}')")
-        self.connection.commit()
-
-    def db_list_customers(self):
-        customers_list = self.cursor.execute(f"SELECT * FROM Customers").fetchall()
-        for customer in customers_list:
-            print(customer)
-
-    def db_list_customer_id(self):
-        customer_id_list = self.cursor.execute(f"SELECT customer_id FROM Customers").fetchall()
-        return customer_id_list
-    
-    def db_delete_customer_id(self, customer_id: str):
-        self.cursor.execute(f"DELETE FROM Customers WHERE customer_id = '{customer_id}'")
-        self.connection.commit()    
-
-    def db_delete_customer_all(self):
-        self.cursor.execute(f"DELETE FROM Customers")
-        self.connection.commit()
-
-#ITEM MANAGEMENT
-
-    def db_create_item(self, plu: int, name: str, type: str, weight: float, price: float):
-        self.cursor.execute(f"INSERT INTO Items VALUES ('{plu}', '{name}', '{type}', '{weight}', '{price}')")
-        self.connection.commit()
-    
-    def db_list_items(self):
-        items_list = self.cursor.execute(f"SELECT * FROM Items").fetchall()
-        for item in items_list:
-            print(item)
-    
-    def db_return_items(self):
-        items_list = self.cursor.execute(f"SELECT * FROM Items").fetchall()
-        return items_list
-    
-    def db_list_item_plu(self):
-        item_plu_list = self.cursor.execute(f"SELECT plu FROM Items").fetchall()
-        return item_plu_list
-    
-    def db_fetch_item_data(self, item_name):
-        item_data = self.cursor.execute(f"SELECT * FROM Items WHERE name='{item_name}'").fetchone()
-        return item_data
-    
-    def db_delete_item_name(self, name: str):
-        self.cursor.execute(f"DELETE FROM Items WHERE name = '{name}'")
-        self.connection.commit() 
-
-    def db_delete_item_all(self):
-        self.cursor.execute(f"DELETE FROM Items")
-        self.connection.commit()
-
-#TRANSACTION MANAGEMENT
-
-    def db_create_transaction(self, transaction_id: str, customer_id: str, employee_id: str, total: float, timestamp: datetime):
-        self.cursor.execute(f"INSERT INTO Transactions VALUES ('{transaction_id}', '{customer_id}', '{employee_id}', '{total}', '{timestamp}')")
-        self.connection.commit()
-
-    def db_itemize_transaction(self, transaction_id: str, plu, item_to_add: str, amount):
-        self.cursor.execute(f"INSERT INTO Itemizer VALUES ('{transaction_id}', '{plu}', '{item_to_add}', '{amount}')")
-        self.connection.commit()
-
-    def db_list_transactions(self):
-        transactions_list = self.cursor.execute(f"SELECT * FROM Transactions").fetchall()
-        for transaction in transactions_list:
-            print(transaction)
-    
-    def db_delete_transaction_id(self, transaction_id: str):
-        self.cursor.execute(f"DELETE FROM Transactions WHERE transaction_id = '{transaction_id}'")
-        self.cursor.execute(f"DELETE FROM Itemizer WHERE transaction_id = '{transaction_id}'")
-        self.connection.commit() 
-
-    def db_delete_transactions_all(self):
-        self.cursor.execute(f"DELETE FROM Transactions")
-        self.cursor.execute(f"DELETE FROM Itemizer")
-        self.connection.commit()
-
-
+import session as s
+from database_management import *
 
 #MENU CLASS
 
 class Menu:
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         self._header = ''
         self._options = {
             1: None, 
@@ -225,22 +39,21 @@ class Menu:
         option = int(input(''))
         return self._options[option]
 
-    def execute(self):
-        global menu 
-        global option
-        menu = option
+    def execute(self, db_name, *args):
+        s.s_menu = s.s_option
+        pass
 
 #Menu Item Class
 
 class MenuItem:
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         self._header = ''
         self._function = None  
 
     def __str__(self):
         return self._header
 
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #UTILITY FUNCTIONS
@@ -251,14 +64,13 @@ class MenuReturn(MenuItem):
         self._header = f'Return - ' + str(return_menu)
         self._menu = return_menu
 
-    def execute(self):
-        global menu 
-        menu = self._menu()
+    def execute(self, db_name, *args):
+        s.s_menu = self._menu(db_name)
 
 #MAIN MENU
 
 class MainMenu(Menu):
-    def __init__(self) -> None:
+    def __init__(self, db_name) -> None:
         super().__init__()
         self._header = f'{db_name} - Main Menu'
         self._options = {
@@ -279,7 +91,7 @@ class MainMenu(Menu):
 #TRANSACTION MANAGEMENT MENU
 
 class MenuTransactionManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Transaction Management'
         self._options = {
@@ -298,7 +110,7 @@ class MenuTransactionManagement(Menu):
 #CREATE TRANSACTIONS MENU
 
 class MenuCreateTransactions(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Transactions'
         self._options = {
@@ -317,7 +129,7 @@ class MenuCreateTransactions(Menu):
 #DELETE TRANSACTIONS MENU
 
 class MenuDeleteTransactions(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Transactions'
         self._options = {
@@ -338,24 +150,24 @@ class MenuDeleteTransactions(Menu):
 #List Transactions
 
 class ListTransactions(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'List Transactions'
-        self._function = session.db_list_transactions
+        self._function = db_list_transactions
 
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #Create Transactions
     #Create Transaction Custom
 
 class CreateTransactionCustom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Custom Transaction'
-        self._function = session.db_create_transaction
+        self._function = db_create_transaction
     
-    def execute(self):
+    def execute(self, *args):
         transaction_id = input('Transaction ID: ')
         customer_id = int(input('Customer ID: '))
         employee_id = input('Employee ID: ')
@@ -370,78 +182,78 @@ class CreateTransactionCustom(MenuItem):
             item_to_add = input('Select item: ')
             if item_to_add == '':
                 break
-            item_data = session.db_fetch_item_data(item_to_add)
+            item_data = db_fetch_item_data(item_to_add)
             amount_to_add = int(input('Amount: '))
             for item in range(amount_to_add):
                 print(transaction_id, item_data[0], item_data[1], amount_to_add)
-                session.db_itemize_transaction(transaction_id, item_data[0], item_data[1], amount_to_add)
+                db_itemize_transaction(transaction_id, item_data[0], item_data[1], amount_to_add)
 
     #Create Transaction Random
 
 class CreateTransactionRandom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Random Transaction'
-        self._function = session.db_create_transaction
+        self._function = db_create_transaction
 
-    def execute(self):
-        transaction_id, customer_id, employee_id, total, timestamp = create_transaction(session.db_list_customer_id(), session.db_list_employee_id(), 5.00)
+    def execute(self, *args):
+        transaction_id, customer_id, employee_id, total, timestamp = create_transaction(db_list_customer_id(), db_list_employee_id(), 5.00)
         print(transaction_id, customer_id, employee_id, total, timestamp)
         self._function(transaction_id, customer_id, employee_id, total, timestamp)
         print(f'Transaction {transaction_id} created')
-        list_of_items = session.db_return_items()
+        list_of_items = db_return_items()
         choosen_items = randint(1, (len(list_of_items)))
         for item in range(choosen_items):
             item_data = choice(list_of_items)
             amount = randint(1, 10)
-            session.db_itemize_transaction(transaction_id, item_data[0], item_data[1], amount)
+            db_itemize_transaction(transaction_id, item_data[0], item_data[1], amount)
 
     #Create Transaction Multiple
     
 class CreateTransactionMultiple(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Multiple Transactions'
-        self._function = session.db_create_transaction
+        self._function = db_create_transaction
 
-    def execute(self):
+    def execute(self, *args):
         transaction_number = int(input('Number of transactions: '))
         if transaction_number == 0:
             return
         for number in range(transaction_number):
-            transaction_id, customer_id, employee_id, total, timestamp = create_transaction(session.db_list_customer_id(), session.db_list_employee_id(), 5.00)
+            transaction_id, customer_id, employee_id, total, timestamp = create_transaction(db_list_customer_id(), db_list_employee_id(), 5.00)
             print(transaction_id, customer_id, employee_id, total, timestamp)
             self._function(transaction_id, customer_id, employee_id, total, timestamp)
             print(f'Transaction {transaction_id} created')
-            list_of_items = session.db_return_items()
+            list_of_items = db_return_items()
             choosen_items = randint(1, len(list_of_items))
             for item in range(choosen_items):
                 item_data = choice(list_of_items)
                 amount = randint(1, 10)
-                session.db_itemize_transaction(transaction_id, item_data[0], item_data[1], amount)
+                db_itemize_transaction(transaction_id, item_data[0], item_data[1], amount)
 
 #Delete Transactions
     #Delete Transaction via ID
 
 class DeleteTransactionID(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Transaction via ID'
-        self._function = session.db_delete_transaction_id
+        self._function = db_delete_transaction_id
 
-    def execute(self):
+    def execute(self, *args):
         transaction_id_prompt = input('Enter Transaction ID: ')
         self._function(transaction_id_prompt)
 
     #Delete Transaction All
 
 class DeleteTransactionAll(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete All Transactions'
-        self._function = session.db_delete_transactions_all
+        self._function = db_delete_transactions_all
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #CUSTOMERS
@@ -449,7 +261,7 @@ class DeleteTransactionAll(MenuItem):
 #CUSTOMER MANAGEMENT MENU
 
 class MenuCustomerManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Customer Management'
         self._options = {
@@ -468,7 +280,7 @@ class MenuCustomerManagement(Menu):
 #CREATE CUSTOMERS MENU
 
 class MenuCreateCustomer(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Customers'
         self._options = {
@@ -487,7 +299,7 @@ class MenuCreateCustomer(Menu):
 #DELETE CUSTOMERS MENU
 
 class MenuDeleteCustomer(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Customers'
         self._options = {
@@ -508,24 +320,24 @@ class MenuDeleteCustomer(Menu):
 #List Customers
 
 class ListCustomers(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'List Customers'
-        self._function = session.db_list_customers
+        self._function = db_list_customers
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #Create Customers
     #Create Customer Custom
 
 class CreateCustomerCustom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Custom Customer'
-        self._function = session.db_create_customer
+        self._function = db_create_customer
     
-    def execute(self):
+    def execute(self, *args):
         f_name = input('First name: ')
         l_name = input('Last name: ')
         gender = input('Gender: ')
@@ -539,12 +351,12 @@ class CreateCustomerCustom(MenuItem):
     #Create Customer Random
 
 class CreateCustomerRandom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Random Customer'
-        self._function = session.db_create_customer
+        self._function = db_create_customer
     
-    def execute(self):
+    def execute(self, *args):
         f_name, l_name, gender, dob, customer_id = create_customer()
         print (f_name, l_name, gender, dob, customer_id)
         self._function(f_name, l_name, gender, dob, customer_id)
@@ -552,12 +364,12 @@ class CreateCustomerRandom(MenuItem):
     #Create Customer Multiple
 
 class CreateCustomerMultiple(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Multiple Customers'
-        self._function = session.db_create_customer
+        self._function = db_create_customer
     
-    def execute(self):    
+    def execute(self, *args):    
         customer_number = int(input('Number of customers: '))
         if customer_number == 0:
             return
@@ -570,24 +382,24 @@ class CreateCustomerMultiple(MenuItem):
     #Delete Customer via ID
 
 class DeleteCustomerID(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Customer via ID'
-        self._function = session.db_delete_customer_id
+        self._function = db_delete_customer_id
 
-    def execute(self):
+    def execute(self, *args):
         customer_id_prompt = int(input('Enter Customer ID: '))
         self._function(customer_id_prompt)
 
     #Delete Customer All
 
 class DeleteCustomerAll(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete All Customers'
-        self._function = session.db_delete_customer_all
+        self._function = db_delete_customer_all
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #EMPLOYEES
@@ -595,7 +407,7 @@ class DeleteCustomerAll(MenuItem):
 #EMPLOYEE MANAGEMENT MENU
 
 class MenuEmployeeManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Employee Management'
         self._options = {
@@ -614,7 +426,7 @@ class MenuEmployeeManagement(Menu):
 #CREATE EMPLOYEES MENU
 
 class MenuCreateEmployee(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Employees'
         self._options = {
@@ -633,7 +445,7 @@ class MenuCreateEmployee(Menu):
 #DELETE EMPLOYEES MENU
 
 class MenuDeleteEmployees(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Employees'
         self._options = {
@@ -654,24 +466,24 @@ class MenuDeleteEmployees(Menu):
 #List Employees
 
 class ListEmployees(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'List Employees'
-        self._function = session.db_list_employees
+        self._function = db_list_employees
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #Create Employees
     #Create Employees Custom
 
 class CreateEmployeeCustom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Custom Employee'
-        self._function = session.db_create_employee
+        self._function = db_create_employee
     
-    def execute(self):
+    def execute(self, *args):
         f_name = input('First name: ')
         l_name = input('Last name: ')
         gender = input('Gender: ')
@@ -682,12 +494,12 @@ class CreateEmployeeCustom(MenuItem):
     #Create Employee Random
 
 class CreateEmployeeRandom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Random Employe'
-        self._function = session.db_create_employee
+        self._function = db_create_employee
     
-    def execute(self):
+    def execute(self, *args):
         f_name, l_name, gender, phone_no, employee_id = create_employee()
         print (f_name, l_name, gender, phone_no, employee_id)
         self._function(f_name, l_name, gender, phone_no, employee_id)  
@@ -695,12 +507,12 @@ class CreateEmployeeRandom(MenuItem):
     #Create Employee Multiple
 
 class CreateEmployeeMultiple(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Multiple Employees'
-        self._function = session.db_create_employee
+        self._function = db_create_employee
     
-    def execute(self):
+    def execute(self, *args):
         employee_number = int(input('Number of employees: '))
         if employee_number == 0:
             return
@@ -713,24 +525,24 @@ class CreateEmployeeMultiple(MenuItem):
     #Delete Employee via ID
 
 class DeleteEmployeeID(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Employee via ID'
-        self._function = session.db_delete_employee_id
+        self._function = db_delete_employee_id
     
-    def execute(self):
+    def execute(self, *args):
         employee_id_prompt = input('Enter Employee ID: ')
         self._function(employee_id_prompt)        
 
     #Delete Employee All
 
 class DeleteEmployeeAll(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete All Employees'
-        self._function = session.db_delete_employee_all
+        self._function = db_delete_employee_all
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #ITEMS
@@ -738,7 +550,7 @@ class DeleteEmployeeAll(MenuItem):
 #ITEM MANAGEMENT MENU
 
 class MenuItemManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Item Management'
         self._options = {
@@ -757,7 +569,7 @@ class MenuItemManagement(Menu):
 #CREATE ITEMS MENU
 
 class MenuCreateItems(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Items'
         self._options = {
@@ -776,7 +588,7 @@ class MenuCreateItems(Menu):
 #DELETE ITEMS MENU
 
 class MenuDeleteItems(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Items'
         self._options = {
@@ -797,24 +609,24 @@ class MenuDeleteItems(Menu):
 #List Items
 
 class ListItems(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'List Items'
-        self._function = session.db_list_items
+        self._function = db_list_items
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #Create Items
     #Create Custom Item
 
 class CreateItemCustom(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Custom Item'
-        self._function = session.db_create_item
+        self._function = db_create_item
     
-    def execute(self):
+    def execute(self, *args):
         plu = int(input('Item PLU: '))
         name = input('Item name:')
         type = input('Type: ')
@@ -825,12 +637,12 @@ class CreateItemCustom(MenuItem):
     #Create Standard List Item
 
 class CreateItemStandardList(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Standard List of Items'
-        self._function = session.db_create_item
+        self._function = db_create_item
     
-    def execute(self):
+    def execute(self, *args):
         milk = (644455, 'Milk', 'Dairy', 1, 2.50)
         eggs = (994111, 'Eggs', 'Dairy' , 0.5, 3.00)                           
         cheese = (222449, 'Cheese', 'Dairy', 1, 10.00)
@@ -842,36 +654,36 @@ class CreateItemStandardList(MenuItem):
         item_standard_list = [milk, eggs, cheese, bread, coffee, juice, pork, chicken_breast]
         for item in item_standard_list:
             plu, name, type, weight, price = item
-            session.db_create_item(plu, name, type, weight, price)
+            db_create_item(plu, name, type, weight, price)
 
 #Delete Items
     #Delete Items via Name
 
 class DeleteItemName(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete Item via Name'
-        self._function = session.db_delete_item_name
+        self._function = db_delete_item_name
     
-    def execute(self):
+    def execute(self, *args):
         item_name_prompt = input('Enter Item Name:')
         self._function(item_name_prompt)
         
     #Delete Items All
 
 class DeleteItemAll(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Delete All Items'
-        self._function = session.db_delete_item_all
+        self._function = db_delete_item_all
     
-    def execute(self):
+    def execute(self, *args):
         self._function()
 
 #DATABASE MANAGEMENT MENU
 
 class MenuDatabaseManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Database Management'
         self._options = {
@@ -890,7 +702,7 @@ class MenuDatabaseManagement(Menu):
 #TABLE MANAGEMENT MENU
 
 class MenuTableManagement(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Table Management'
         self._options = {
@@ -909,7 +721,7 @@ class MenuTableManagement(Menu):
 #CREATE TABLES MENU
 
 class MenuCreateTables(Menu):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Create Tables'
         self._options = {
@@ -928,133 +740,40 @@ class MenuCreateTables(Menu):
 #List Tables
 
 class ListTables(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'List Tables'
-        self._function = session.db_list_tables
+        self._function = db_list_tables
 
 #Create Tables
     #Create Transactions Table
 
 class CreateTableTransactions(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Transactions Table'
-        self._function = session.db_create_transactions_table
+        self._function = db_create_transactions_table
 
     #Create Customers Table
 
 class CreateTableCustomers(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Customers Table'
-        self._function = session.db_create_customers_table
+        self._function = db_create_customers_table
 
     #Create Employees Table
 
 class CreateTableEmployees(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Employees Table'
-        self._function = session.db_create_employees_table
+        self._function = db_create_employees_table
 
     #Create Items Table
 
 class CreateTableItems(MenuItem):
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self._header = 'Items Table'
-        self._function = session.db_create_items_table
-
-#LOGIN
-def login():
-    login_session = DatabaseSession('users', None)
-    login_session.connect_to_database()
-    login_session.db_create_users_table()
-    log.write(f'{datetime.now()} (login) - Login verification session initiated for users.db\n')
-
-    login_employee_id = input('Employee ID: ')
-    password = input('Password: ')
-    log.write(f'{datetime.now()} (login) - Login attempt made with {login_employee_id} / {password}\n')
-
-
-    if login_session.db_check_user(login_employee_id) == False:
-        log.write(f'{datetime.now()} (login) - Login failed with {login_employee_id} / {password}\n')
-        log.write(f'{datetime.now()} (login) - App shutting down\n')
-        exit()
-    
-    pw_key = generate_key(password)
-    auth = login_session.db_check_password(pw_key, login_employee_id)
-
-    return auth, login_employee_id
-
-def generate_key(password):
-    seed(password)
-    char_list = choices(ascii_lowercase, k=16)
-    pw_key = ''.join(char_list)
-
-    return pw_key
-
-def create_user(employee_id, session):
-    print(f'Employee {employee_id} does not exist.')
-    print(f'Do you want to create a new user account?')
-    print ('1 - yes')
-    print ('0 - no')
-    create_user_prompt = int(input(''))
-
-    if create_user_prompt == 0:
-        return
-    
-    print(f'Enter the password for {employee_id}')
-    password = input('')
-    pw_key = generate_key(password)
-
-    print(f'Enter desired access level:')
-    print('1 - Cashier')
-    print('2 - Manager')
-    print('3 - Administrator')
-    access_level = int(input(''))
-
-    session.db_create_user(employee_id, pw_key, access_level)
-
-#MAIN
-    #LOGIN
-
-with open(f'{(datetime.now()).strftime("%d.%m.%Y")}.log', 'a') as log:
-    log.write(f'{datetime.now()} - App logging initiated\n')
-    auth, user_id = login()
-
-    if auth == False:
-        log.write(f'{datetime.now()} - Wrong password entered\n')
-        print('Incorrect Employee ID or password')
-
-        log.write(f'{datetime.now()} - App shutting down\n')
-        exit()
-    log.write(f'{datetime.now()} - Login successfull\n')
-    print('Login successfull')
-    
-
-        #DB SESSION
-    db_name = input('Enter DB name: ')
-    session = DatabaseSession(db_name, user_id)
-
-    print (f"Connect to DB '{db_name}'?")
-    print ('1 - yes')
-    print ('0 - no')
-    
-
-    connect_prompt = int(input())
-
-    if connect_prompt == 1:
-        session.connect_to_database()
-    elif connect_prompt == 0:
-        log.write(f'{datetime.now()} - App shutting down\n')
-        exit()
-        
-    log.write(f'{datetime.now()} - Session initiated for {db_name}\n')
-    menu = MainMenu()
-    while True:
-        print(menu)
-        menu.list_options()
-        option = menu.choose_option()
-        option.execute()
+        self._function = db_create_items_table
