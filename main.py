@@ -6,15 +6,8 @@ from menu_screens import MainMenu
 from login import login
 
 #MAIN
-    #LOGIN
-auth, user_id = login()
-
-if auth == False:
-    print('Incorrect Employee ID or password')
-    exit()
-print('Login successfull')
-
     #DB SESSION
+login()
 s.s_db_name = input('Enter DB name: ')
 
 print (f"Connect to DB '{s.s_db_name}'?")

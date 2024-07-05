@@ -3,7 +3,7 @@
 from people import create_employee, create_customer
 from transactions import create_transaction
 from datetime import date, datetime
-from random import choice, choices, randint, seed
+from random import choice, randint
 
 import session as s
 from database_management import *

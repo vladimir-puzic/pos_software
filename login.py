@@ -1,23 +1,27 @@
 #file contains code that manages user login and authentication
 
-import database_management
-from random import choice, choices, randint, seed
+import database_management as dm
+from random import choices, seed
 from string import ascii_lowercase
-from os import path
 
 #LOGIN
 def login():
-    database_management.connect_to_database('users')
-    database_management.db_create_users_table()
+    dm.connect_to_database('users')
+    dm.db_create_users_table()
 
     login_employee_id = input('Employee ID: ')
     password = input('Password: ')
 
-    if database_management.db_check_user(login_employee_id) == False:
+    if dm.db_check_user(login_employee_id) == False:
         exit()
     
     pw_key = generate_key(password)
-    auth = database_management.db_check_password(pw_key, login_employee_id)
+    auth = dm.db_check_password(pw_key, login_employee_id)
+
+    if auth == False:
+        print('Incorrect Employee ID or password')
+        exit()
+    print('Login successfull')
 
     return auth, login_employee_id
 
