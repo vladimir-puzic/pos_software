@@ -1,9 +1,10 @@
+#file contains code for communicating with the database using SQLite
+
 import sqlite3
 from datetime import date, datetime
 
 import session as s
 #SESSION MANAGEMENT
-
 
 def connect_to_database(db_name):
     s.s_connection = sqlite3.connect(f'{db_name}.db')

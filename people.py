@@ -1,6 +1,9 @@
+#file contains code for creating Employee and Customer classes
+
 from datetime import datetime, date, timedelta
 from random import randint, choice
 
+# \/ Employee and Customer parent class
 class Person:
     def __init__(self, f_name: str, l_name: str, gender: str):
         self._f_name = f_name

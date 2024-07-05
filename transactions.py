@@ -1,3 +1,5 @@
+#file contains code for creating Items and Transactions
+
 from people import Person, Customer, Employee
 from datetime import datetime
 from random import randint, choice
@@ -38,6 +40,7 @@ def itemize(transaction_id: str):
     pass
 
 if __name__ == '__main__':
+    #placeholder items, used for testing
     milk = Item(644455, 'Milk', 'Dairy', 1, 2.50)
     print (milk)
     eggs = Item(994111, 'Eggs', 'Dairy' , 0.5, 3.00)

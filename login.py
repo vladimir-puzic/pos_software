@@ -1,3 +1,5 @@
+#file contains code that manages user login and authentication
+
 import database_management
 from random import choice, choices, randint, seed
 from string import ascii_lowercase

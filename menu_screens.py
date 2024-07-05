@@ -1,3 +1,5 @@
+#file contains code for managing the menu system
+
 from people import create_employee, create_customer
 from transactions import create_transaction
 from datetime import date, datetime
