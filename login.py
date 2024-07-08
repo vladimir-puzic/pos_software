@@ -9,19 +9,37 @@ def login():
     dm.connect_to_database('users')
     dm.db_create_users_table()
 
-    login_employee_id = input('Employee ID: ')
-    password = input('Password: ')
+    for i in range(3):
+        login_employee_id = input('Employee ID: ')
+        password = input('Password: ')
 
-    if dm.db_check_user(login_employee_id) == False:
-        exit()
-    
-    pw_key = generate_key(password)
-    auth = dm.db_check_password(pw_key, login_employee_id)
+        if dm.db_check_user(login_employee_id) == False:
+            if i < 2:
+                print('User ID not found')
+                continue
+            print('User ID not found')
+            print('Closing the application')
+            exit()
+        
+        pw_key = generate_key(password)
+        auth = dm.db_check_password(pw_key, login_employee_id)
 
-    if auth == False:
-        print('Incorrect Employee ID or password')
-        exit()
-    print('Login successfull')
+        if auth == False:
+            if i < 2:
+                print('Incorrect password')
+                continue
+            print('Incorrect password')
+            
+            print('Do you want to reset your password?')
+            print ('1 - yes')
+            print ('0 - no')
+            pw_reset_prompt = input('')
+            if pw_reset_prompt == 0:
+                exit()
+            reset_password()
+
+        print('Login successfull')
+        break
 
     return auth, login_employee_id
 
@@ -53,3 +71,6 @@ def create_user(employee_id, session):
     access_level = int(input(''))
 
     session.db_create_user(employee_id, pw_key, access_level)
+
+def reset_password():
+    pass

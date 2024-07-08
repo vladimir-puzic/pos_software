@@ -1,5 +1,3 @@
-from datetime import date, datetime
-
 import session as s
 import database_management as dm
 from menu_screens import MainMenu

@@ -68,7 +68,7 @@ def db_create_user(employee_id: str, password: str, access_level: int):
     commit()
 
 def db_check_user(employee_id: str):
-    user_list = query(f"SELECT employee_id FROM Users")
+    user_list = query(f"SELECT employee_id FROM Users") # as per issue #22, using .fetchall() to gather data from DB is causing the output to be a list of tuples instead of a list of employee id's
     for index, item in enumerate(user_list):
         user_list[index] = item[0]
 
