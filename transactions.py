@@ -1,4 +1,5 @@
 #file contains code for creating Items and Transactions
+#as of now the classes are not used in the application. The data for items and transactions is generaded using functions and forwarded to the database directly
 
 from datetime import datetime
 from random import randint, choice

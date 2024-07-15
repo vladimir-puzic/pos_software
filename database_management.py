@@ -46,7 +46,7 @@ def db_create_users_table():
     commit()
 
 def db_create_employees_table():
-    statement("CREATE TABLE IF NOT EXISTS Employees ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'phone_number' INTEGER, 'employee_id' TEXT)")
+    statement("CREATE TABLE IF NOT EXISTS Employees ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'phone_number' INTEGER, 'employee_id' TEXT, 'email' TEXT)")
 
 def db_create_customers_table():
     statement("CREATE TABLE IF NOT EXISTS Customers ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'date_of_birth' DATE, 'customer_id' INTEGER)")
@@ -85,8 +85,8 @@ def db_check_password(pw_key: str, employee_id: str):
 
 #EMPLOYEE MANAGEMENT
 
-def db_create_employee(f_name: str, l_name: str, gender: str, phone_no: int, employee_id: str):
-    statement(f"INSERT INTO Employees VALUES ('{f_name}', '{l_name}', '{gender}', '{phone_no}', '{employee_id}')")
+def db_create_employee(f_name: str, l_name: str, gender: str, phone_no: int, employee_id: str, email: str):
+    statement(f"INSERT INTO Employees VALUES ('{f_name}', '{l_name}', '{gender}', '{phone_no}', '{employee_id}', '{email}')")
     commit()
 
 def db_list_employees():

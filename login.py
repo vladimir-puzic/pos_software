@@ -3,6 +3,7 @@
 import database_management as dm
 from random import choices, seed
 from string import ascii_lowercase
+import os
 
 #LOGIN
 def login():
@@ -29,14 +30,14 @@ def login():
                 print('Incorrect password')
                 continue
             print('Incorrect password')
-            
+
             print('Do you want to reset your password?')
             print ('1 - yes')
             print ('0 - no')
             pw_reset_prompt = input('')
             if pw_reset_prompt == 0:
                 exit()
-            reset_password()
+            reset_password(login_employee_id)
 
         print('Login successfull')
         break
@@ -72,5 +73,5 @@ def create_user(employee_id, session):
 
     session.db_create_user(employee_id, pw_key, access_level)
 
-def reset_password():
+def reset_password(login_employee_id):
     pass

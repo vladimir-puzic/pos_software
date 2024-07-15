@@ -1,4 +1,5 @@
 #file contains code for creating Employee and Customer classes
+#as of now the classes are not used in the application. The data for employeed and customers is generaded using functions and forwarded to the database directly
 
 from datetime import datetime, date, timedelta
 from random import randint, choice
@@ -24,9 +25,10 @@ class Employee(Person):
         super().__init__(f_name, l_name, gender)
         self._phone_no = phone_no
         self._employee_id = employee_id
+        self._email = f'{f_name}.{l_name}@email.com'
     
     def __str__(self):
-        return f'{self._employee_id}: {self._f_name} {self._l_name} ({self._gender}) Phone number: {self._phone_no}'
+        return f'{self._employee_id}: {self._f_name} {self._l_name} ({self._gender}) Phone number: {self._phone_no} Email: {self._email}'
 
 def random_date(start, end):
     delta = end - start
@@ -58,8 +60,10 @@ def create_employee():
     phone_no = int(f'6{randint(1,6)}{randint(000000,999999):06d}')
 
     employee_id = (f'{f_name[0].lower()}{l_name[0].lower()}{randint(000000,999999)}')
+
+    email = f'{f_name}.{l_name}@email.com'
     
-    return [f_name, l_name, gender, phone_no, employee_id]
+    return [f_name, l_name, gender, phone_no, employee_id, email]
 
 def create_customer():
     genders = ['Female', 'Male']

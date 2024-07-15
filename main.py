@@ -5,7 +5,7 @@ from login import login
 
 #MAIN
     #DB SESSION
-login()
+#login()
 s.s_db_name = input('Enter DB name: ')
 
 print (f"Connect to DB '{s.s_db_name}'?")

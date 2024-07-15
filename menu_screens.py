@@ -489,7 +489,8 @@ class CreateEmployeeCustom(MenuItem):
         gender = input('Gender: ')
         phone_no = int(input('Phone number: '))
         employee_id = input('Employee ID:')
-        self._function(f_name, l_name, gender, phone_no, employee_id)
+        email = input('Email address:')
+        self._function(f_name, l_name, gender, phone_no, employee_id, email)
 
     #Create Employee Random
 
@@ -500,9 +501,9 @@ class CreateEmployeeRandom(MenuItem):
         self._function = db_create_employee
     
     def execute(self, *args):
-        f_name, l_name, gender, phone_no, employee_id = create_employee()
-        print (f_name, l_name, gender, phone_no, employee_id)
-        self._function(f_name, l_name, gender, phone_no, employee_id)  
+        f_name, l_name, gender, phone_no, employee_id, email = create_employee()
+        print (f_name, l_name, gender, phone_no, employee_id, email)
+        self._function(f_name, l_name, gender, phone_no, employee_id, email)
 
     #Create Employee Multiple
 
@@ -517,9 +518,9 @@ class CreateEmployeeMultiple(MenuItem):
         if employee_number == 0:
             return
         for number in range(employee_number):
-            f_name, l_name, gender, phone_no, employee_id = create_employee()
+            f_name, l_name, gender, phone_no, employee_id, email = create_employee()
             print (f_name, l_name, gender, phone_no, employee_id)
-            self._function(f_name, l_name, gender, phone_no, employee_id)        
+            self._function(f_name, l_name, gender, phone_no, employee_id, email)       
 
 #Delete Employees
     #Delete Employee via ID
