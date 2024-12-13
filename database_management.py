@@ -19,7 +19,7 @@ def return_current_user(self): #same as for above
     return self._user
 
 def query(query):
-    data = s.s_cursor.execute(query).fetchall()
+    data = s.s_cursor.execute(query).fetchall() # as per issue #22, using .fetchall() to gather data from DB is causing the output to be a list of tuples instead of a list of employee id's
     return data
 
 def query_single(query):
@@ -83,6 +83,10 @@ def db_check_password(pw_key: str, employee_id: str):
         return True
     return False
 
+def db_return_user_data(employee_id):
+    user_data = query_single(f"SELECT * FROM Users WHERE employee_id = '{employee_id}'")
+    return user_data
+
 #EMPLOYEE MANAGEMENT
 
 def db_create_employee(f_name: str, l_name: str, gender: str, phone_no: int, employee_id: str, email: str):
@@ -107,9 +111,9 @@ def db_delete_employee_all():
     commit()      
 
 def db_return_employee_data(employee_id):
-    employee_data = query(f"SELECT * FROM Employees WHERE employee_id = '{employee_id}'")
-    return employee_id
-    
+    employee_data = query_single(f"SELECT * FROM Employees WHERE employee_id = '{employee_id}'")
+    return employee_data
+
 #CUSTOMER MANAGEMENT
 
 def db_create_customer(f_name: str, l_name: str, gender: str, dob: date, customer_id: int):

@@ -12,8 +12,8 @@ def login():
 
 
     for i in range(3):
-        login_employee_id = input('Employee ID: ')
-        password = input('Password: ')
+        login_employee_id = 'vp123456' #input('Employee ID: ')
+        password = ''#input('Password: ')
 
         if dm.db_check_user(login_employee_id) == False:
             if i < 2:
