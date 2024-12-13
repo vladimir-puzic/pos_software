@@ -10,6 +10,7 @@ def login():
     dm.connect_to_database('users')
     dm.db_create_users_table()
 
+
     for i in range(3):
         login_employee_id = input('Employee ID: ')
         password = input('Password: ')
@@ -21,7 +22,7 @@ def login():
             print('User ID not found')
             print('Closing the application')
             exit()
-        
+
         pw_key = generate_key(password)
         auth = dm.db_check_password(pw_key, login_employee_id)
 
@@ -60,7 +61,7 @@ def create_user(employee_id, session):
 
     if create_user_prompt == 0:
         return
-    
+
     print(f'Enter the password for {employee_id}')
     password = input('')
     pw_key = generate_key(password)
@@ -74,4 +75,4 @@ def create_user(employee_id, session):
     session.db_create_user(employee_id, pw_key, access_level)
 
 def reset_password(login_employee_id):
-    pass
+    print (dm.db_return_employee_data(login_employee_id))

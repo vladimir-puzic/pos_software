@@ -106,6 +106,10 @@ def db_delete_employee_all():
     statement(f"DELETE FROM Employees")
     commit()      
 
+def db_return_employee_data(employee_id):
+    employee_data = query(f"SELECT * FROM Employees WHERE employee_id = '{employee_id}'")
+    return employee_id
+    
 #CUSTOMER MANAGEMENT
 
 def db_create_customer(f_name: str, l_name: str, gender: str, dob: date, customer_id: int):
