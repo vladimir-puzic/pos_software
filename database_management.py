@@ -32,6 +32,9 @@ def statement(statement):
 def commit():
     s.s_connection.commit()
 
+def close_connection():
+    s.s_connection.close()
+
 #DATABASE MANAGEMENT
 
 def db_list_tables():
@@ -41,12 +44,12 @@ def db_list_tables():
         print()
 
 def db_create_users_table():
-    statement("CREATE TABLE IF NOT EXISTS Users ('employee_id' TEXT, 'password' TEXT, 'access_level' INTEGER, UNIQUE(employee_id))")
-    statement(f"INSERT OR IGNORE INTO Users VALUES ('vp123456', 'zyfoksvpsyeddagw', '3')") #this employee account is created with the 'user.db'. It should be the first admin account used for further setup. The password 'hash' is hardcoded, this needs to be addressed
+    statement("CREATE TABLE IF NOT EXISTS Users ('employee_id' TEXT, 'password' TEXT, 'access_level' INTEGER, 'email' TEXT, UNIQUE(employee_id))")
+    statement(f"INSERT OR IGNORE INTO Users VALUES ('vp123456', 'zyfoksvpsyeddagw', '3', 'vladimir.puzic@email.com')") #this employee account is created with the 'user.db'. It should be the first admin account used for further setup. The password 'hash' is hardcoded, this needs to be addressed
     commit()
 
 def db_create_employees_table():
-    statement("CREATE TABLE IF NOT EXISTS Employees ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'phone_number' INTEGER, 'employee_id' TEXT, 'email' TEXT)")
+    statement("CREATE TABLE IF NOT EXISTS Employees ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'phone_number' INTEGER, 'employee_id' TEXT)")
 
 def db_create_customers_table():
     statement("CREATE TABLE IF NOT EXISTS Customers ('first_name' TEXT, 'last_name' TEXT, 'gender' TEXT, 'date_of_birth' DATE, 'customer_id' INTEGER)")

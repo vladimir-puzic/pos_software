@@ -1,8 +1,9 @@
 #file contains code that manages user login and authentication
 
 import database_management as dm
+import session as s
 from random import choices, seed
-from string import ascii_lowercase
+from string import ascii_lowercase, digits
 import os
 
 #LOGIN
@@ -47,8 +48,7 @@ def login():
 
 def generate_key(password):
     seed(password)
-    char_list = choices(ascii_lowercase, k=16)
-    pw_key = ''.join(char_list)
+    pw_key = ''.join(choices(ascii_lowercase, k=16))
 
     return pw_key
 
@@ -75,4 +75,10 @@ def create_user(employee_id, session):
     session.db_create_user(employee_id, pw_key, access_level)
 
 def reset_password(login_employee_id):
-    print (dm.db_return_employee_data(login_employee_id))
+    user_email = (dm.db_return_user_data(login_employee_id)[3])
+    seed()
+    pw_reset_token = ''.join(choices(digits, k=6))
+    with open(f'{user_email}', 'w') as file:
+        file.write(pw_reset_token)
+    print (user_email)
+    print (file.read())
