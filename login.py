@@ -14,8 +14,8 @@ def login():
 
 
     for i in range(3):
-        login_employee_id = 'vp123456' #input('Employee ID: ')
-        password = ''#input('Password: ')
+        login_employee_id = input('Employee ID: ')
+        password = input('Password: ')
 
         if dm.db_check_user(login_employee_id) == False:
             if i < 2:
@@ -89,19 +89,20 @@ def token_check(token: int, token_gen_time: datetime):
     
 #    print (datetime.now() - token_gen_time)
 #    print (timedelta(seconds=5))
-    elif datetime.now() - token_gen_time > timedelta(minutes=1):
+    elif datetime.now() - token_gen_time > timedelta(minutes=5):
         print('Token expired')
         print('Closing the application')
         exit()
     pass
 
-def reset_password():
+def reset_password(login_employee_id):
     while True:
         new_pass = input('Enter new passowrd: ')
         new_pass_check = input('Enter password again: ')
         if new_pass == new_pass_check:
             break
-    
+    new_pw_key = generate_key(new_pass)
+    dm.db_change_password(login_employee_id, new_pw_key)
 
 
 def account_recovery(login_employee_id):
@@ -113,5 +114,8 @@ def account_recovery(login_employee_id):
     print('The token expires after 5 minutes')
 
     token_check(token, datetime.now())
+    reset_password(login_employee_id)
+    
+    print ('Your password has been reset')
 
 

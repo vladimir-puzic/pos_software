@@ -66,8 +66,8 @@ def db_drop_table(table_name: str):
 
 #USER MANAGEMENT
 
-def db_create_user(employee_id: str, password: str, access_level: int):
-    statement(f"INSERT INTO Users VALUES ('{employee_id}', '{password}', '{access_level}')")
+def db_create_user(employee_id: str, pw_key: str, access_level: int):
+    statement(f"INSERT INTO Users VALUES ('{employee_id}', '{pw_key}', '{access_level}')")
     commit()
 
 def db_check_user(employee_id: str):
@@ -87,10 +87,12 @@ def db_check_password(pw_key: str, employee_id: str):
     return False
 
 def db_return_user_data(employee_id):
-    user_data = query_single(f"SELECT * FROM Users WHERE employee_id = '{employee_id}'")
+    user_data = query_single(f"SELECT * FROM Users WHERE employee_id='{employee_id}'")
     return user_data
 
-def db_change_password(employee_id, password
+def db_change_password(employee_id, pw_key):
+    statement(f"UPDATE Users SET password='{pw_key}' WHERE employee_id='{employee_id}'")
+    commit()
 
 #EMPLOYEE MANAGEMENT
 
