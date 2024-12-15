@@ -5,6 +5,7 @@ import session as s
 from random import choices, seed
 from string import ascii_lowercase, digits
 import os
+from datetime import datetime, timedelta 
 
 #LOGIN
 def login():
@@ -39,7 +40,7 @@ def login():
             pw_reset_prompt = input('')
             if pw_reset_prompt == 0:
                 exit()
-            reset_password(login_employee_id)
+            account_recovery(login_employee_id)
 
         print('Login successfull')
         break
@@ -74,11 +75,43 @@ def create_user(employee_id, session):
 
     session.db_create_user(employee_id, pw_key, access_level)
 
-def reset_password(login_employee_id):
-    user_email = (dm.db_return_user_data(login_employee_id)[3])
+def token_generate():
     seed()
     pw_reset_token = ''.join(choices(digits, k=6))
+    return pw_reset_token
+
+def token_check(token: int, token_gen_time: datetime):
+    token_input = input('Password reset token: ')
+    if token_input != token:
+        print('Incorrect password reset token')
+        print('Closing the application')
+        exit()
+    
+#    print (datetime.now() - token_gen_time)
+#    print (timedelta(seconds=5))
+    elif datetime.now() - token_gen_time > timedelta(minutes=1):
+        print('Token expired')
+        print('Closing the application')
+        exit()
+    pass
+
+def reset_password():
+    while True:
+        new_pass = input('Enter new passowrd: ')
+        new_pass_check = input('Enter password again: ')
+        if new_pass == new_pass_check:
+            break
+    
+
+
+def account_recovery(login_employee_id):
+    user_email = (dm.db_return_user_data(login_employee_id)[3])
+    token = token_generate()
     with open(f'{user_email}', 'w') as file:
-        file.write(pw_reset_token)
-    print (user_email)
-    print (file.read())
+        file.write(f'{token}')
+    print('Password reset token has been generated and delivered to your email address')
+    print('The token expires after 5 minutes')
+
+    token_check(token, datetime.now())
+
+

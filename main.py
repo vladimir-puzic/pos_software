@@ -24,4 +24,5 @@ while True:
     print(s.s_menu)
     s.s_menu.list_options()
     s.s_option = s.s_menu.choose_option()
-    s.s_option.execute(s.s_db_name)
+    s.s_option.execute(s.s_db_name) 
+  

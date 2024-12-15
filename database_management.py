@@ -90,6 +90,8 @@ def db_return_user_data(employee_id):
     user_data = query_single(f"SELECT * FROM Users WHERE employee_id = '{employee_id}'")
     return user_data
 
+def db_change_password(employee_id, password
+
 #EMPLOYEE MANAGEMENT
 
 def db_create_employee(f_name: str, l_name: str, gender: str, phone_no: int, employee_id: str, email: str):
